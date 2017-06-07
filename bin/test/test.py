@@ -181,8 +181,8 @@ class TestUyuInstrument(unittest.TestCase):
         param = {
             "trade_type": 1,
             "eye_type": 1,
-            "left_eye_level": "+1.65/-1.50",
-            "right_eye_level": "+1.80/-1.50",
+            "left_eye_level": "+1.65/-1.58",
+            "right_eye_level": "+1.80/-1.58",
             "font_size": 12,
             "line_type": 2,
             "line_count": 2,
