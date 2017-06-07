@@ -99,7 +99,7 @@ def verify_param(param):
                     break
                 if key == 'trade_type':
                     ret  = verify_trade_type(value)
-                    if not flag:
+                    if not ret:
                         flag = ret
                         break
                 if key == 'eye_type':
