@@ -46,10 +46,15 @@ class CreateHandler(core.Handler):
         return error(UAURET.CREATEITEMERR)
 
 
-    def POST(self, *args):
-        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
-        ret = self._post_handler()
-        self.write(ret)
+    def POST(self):
+        try:
+            self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
+            ret = self._post_handler()
+            self.write(ret)
+        except Exception as e:
+            log.warn(e)
+            log.warn(traceback.format_exc())
+            return error(UAURET.SERVERERR)
 
 
 class UpdateHandler(core.Handler):
@@ -79,7 +84,7 @@ class UpdateHandler(core.Handler):
         return error(UAURET.UPDATEITEMERR)
 
 
-    def POST(self, *args):
+    def POST(self):
         try:
             self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
             ret = self._post_handler()

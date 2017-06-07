@@ -48,7 +48,7 @@ class CreateHandler(core.Handler):
         params.update({'id': prescription_id})
         return success(data=params)
 
-    def POST(self, *args):
+    def POST(self):
         try:
             self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
             ret = self._post_handler()
@@ -90,7 +90,7 @@ class UpdateHandler(core.Handler):
             return error(UAURET.UPDATEPRESCRIPTIONERR)
         return success(data=params)
 
-    def POST(self, *args):
+    def POST(self):
         try:
             self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
             ret = self._post_handler()
