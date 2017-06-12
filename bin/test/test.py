@@ -248,7 +248,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         self.send = {
@@ -264,6 +264,17 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
+    # @unittest.skip("skipping")
+    def test_train_complete(self):
+        self.url = '/v1/train/close'
+        self.send = {
+            "device_addr": "bt_v1",
+            "id": 1,
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.info(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
 
 
 

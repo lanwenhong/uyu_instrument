@@ -396,10 +396,26 @@ def train_complete(train_id, step, result, times=''):
         values = {
             'step': step,
             'result': result,
+            'state': define.UYU_TRAIN_STATE_END,
             'utime': now
         }
         if times:
             values['times'] = times
+        ret = conn.update(table='train', values=values, where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        if ret == 1:
+            return True
+        return False
+
+
+def train_close(train_id):
+    with get_connection_exception('uyu_core') as conn:
+        now = datetime.datetime.now()
+        where = {'id': train_id}
+        values = {
+            'state': define.UYU_TRAIN_STATE_CLOSE,
+            'utime': now
+        }
         ret = conn.update(table='train', values=values, where=where)
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         if ret == 1:

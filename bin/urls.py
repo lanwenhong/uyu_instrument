@@ -40,5 +40,8 @@ urls = (
     ('^/v1/train/list$', train.ListHandler),
     # 完成训练
     ('^/v1/train/complete$', train.CompleteHandler),
+    # 关闭训练
+    ('^/v1/train/close$', train.CloseHandler),
+
 )
 
