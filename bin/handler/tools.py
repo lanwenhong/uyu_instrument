@@ -62,6 +62,25 @@ def verify_user(userid, user_type=None):
         return ret
 
 
+def verify_train_user(userid):
+    with get_connection_exception('uyu_core') as conn:
+        where = {
+            'id': userid,
+            'user_type': ('in', [define.UYU_USER_ROLE_COMSUMER, define.UYU_USER_ROLE_EYESIGHT])
+        }
+        ret = conn.select_one(table='auth_user', fields='*', where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
+
+def verify_device_info(device_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'id': device_id}
+        ret = conn.select_one(table='device', fields='*', where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
+
 def verify_presc(prescription_id):
     with get_connection_exception('uyu_core') as conn:
         where = {'id': prescription_id}
@@ -114,7 +133,52 @@ def verify_param(param):
 def verify_presc_item(presc_item_id):
     with get_connection_exception('uyu_core') as conn:
         ret = conn.select_one(table='presc_items', fields='*', where={'id': presc_item_id})
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         return ret
+
+
+def get_channel_info(channel_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'id': channel_id}
+        ret = conn.select_one(table='channel', fields='*', where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
+
+def get_store_info(store_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'id': store_id}
+        ret = conn.select_one(table='stores', fields='*', where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
+
+def get_user_presc(userid):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'userid': userid}
+        ret = conn.select_one(table='prescription', fields='*', where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
+
+def get_all_presc_item(presc_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'presc_id': presc_id}
+        ret = conn.select(table='presc_items', fields=['id'], where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
+
+def get_presc_item_content(presc_id):
+    content = []
+    items = get_all_presc_item(presc_id)
+    with get_connection_exception('uyu_core') as conn:
+        for item in items:
+            item_id = item['id']
+            ret = conn.select_one(table='item', fields=['content'], where={'id': item_id})
+            content.append(ret['content'])
+
+        return content
 
 
 def item_create(name, item_type, content):
@@ -259,3 +323,85 @@ def prescription_update_item(presc_id, presc_item_id, count, train_type, param_s
             return True
         return False
 
+
+def train_create(param, channel_id, store_id, presc_id):
+    channel_userid = get_channel_info(channel_id).get('userid')
+    store_userid = get_store_info(store_id).get('userid')
+    content = get_presc_item_content(presc_id)
+    now = datetime.datetime.now()
+    with get_connection_exception('uyu_core') as conn:
+        param['channel_id'] = channel_userid
+        param['store_id'] = store_userid
+        param['presc_id'] = presc_id
+        param['state'] = define.UYU_TRAIN_STATE_START
+        param['step'] = 0
+        param['times'] = 0
+        param['result'] = ''
+        param['presc_content'] = json.dumps(content)
+        param['ctime'] = now
+        param['utime'] = now
+        ret = conn.insert(table='train', values=param)
+        log.debug('func=%s|db ret=%d', inspect.stack()[0][3], ret)
+        if ret == 1:
+            train_id = conn.last_insert_id()
+            return train_id
+        return None
+
+
+def train_info(train_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'id': train_id}
+        keep_fields = [
+            'id', 'userid', 'channel_id', 'store_id',
+            'device_id', 'presc_content', 'item_type',
+            'state', 'step', 'lng', 'lat', 'times',
+            'result', 'ctime', 'utime'
+        ]
+        ret = conn.select_one(table='train', fields=keep_fields, where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        if ret:
+            ret['ctime'] = datetime.datetime.strftime(ret['ctime'], '%Y-%m=%d %H:%M:%S')
+            if ret['utime']:
+                ret['utime'] = datetime.datetime.strftime(ret['utime'], '%Y-%m=%d %H:%M:%S')
+
+        return ret
+
+
+
+def train_list(offset, limit):
+    with get_connection_exception('uyu_core') as conn:
+        other = ' order by ctime desc limit %d offset %d' % (limit, offset)
+        ret = conn.select(table='train', fields='*', other=other)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        if ret:
+            for item in ret:
+                item['ctime'] = datetime.datetime.strftime(item['ctime'], '%Y-%m=%d %H:%M:%S')
+                if item['utime']:
+                    item['utime'] = datetime.datetime.strftime(item['utime'], '%Y-%m=%d %H:%M:%S')
+        return ret
+
+
+def train_total():
+    with get_connection_exception('uyu_core') as conn:
+        sql = 'select count(*) as total from train where ctime>0'
+        ret = conn.get(sql)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return int(ret['total']) if ret['total'] else 0
+
+
+def train_complete(train_id, step, result, times=''):
+    with get_connection_exception('uyu_core') as conn:
+        now = datetime.datetime.now()
+        where = {'id': train_id}
+        values = {
+            'step': step,
+            'result': result,
+            'utime': now
+        }
+        if times:
+            values['times'] = times
+        ret = conn.update(table='train', values=values, where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        if ret == 1:
+            return True
+        return False

@@ -14,11 +14,11 @@ class TestUyuInstrument(unittest.TestCase):
         self.url = ''
         self.send = {}
         self.host = '127.0.0.1'
-        self.port = 8087
+        self.port = 8088
         self.timeout = 2000
         self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
         self.client = HttpClient(self.server, client_class = RequestsClient)
-        self.headers = {'cookie': 'token=94d846e1-8de1-4e18-aa2d-176839717e53'}
+        self.headers = {'cookie': 'token=af38e87d-6d92-426f-9656-1ea306db4a51'}
 
     @unittest.skip("skipping")
     def test_device_login(self):
@@ -175,7 +175,7 @@ class TestUyuInstrument(unittest.TestCase):
 
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_prescription_update_item(self):
         self.url = '/v1/prescription/update_item'
         param = {
@@ -201,6 +201,71 @@ class TestUyuInstrument(unittest.TestCase):
         log.info(ret)
         respcd = json.loads(ret).get('respcd')
         self.assertEqual(respcd, '0000')
+
+
+
+    @unittest.skip("skipping")
+    def test_train_create(self):
+        self.url = '/v1/train/create'
+        self.send = {
+            "device_addr": "bt_v1",
+            "userid": 1276,
+            "device_id": 111,
+            "item_type": 2,
+            "lng": 14.123,
+            "lat": 15.234
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.info(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_train_info(self):
+        self.url = '/v1/train/info'
+        self.send = {
+            "device_addr": "bt_v1",
+            "id": 2,
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.info(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_train_list(self):
+        self.url = '/v1/train/list'
+        self.send = {
+            "device_addr": "bt_v1",
+            "size": 10,
+            "page": 1,
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.info(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    # @unittest.skip("skipping")
+    def test_train_complete(self):
+        self.url = '/v1/train/complete'
+        self.send = {
+            "device_addr": "bt_v1",
+            "step": 3,
+            "times": 40,
+            "result": 'test result',
+            "id": 1
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.info(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+
+
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestUyuInstrument)

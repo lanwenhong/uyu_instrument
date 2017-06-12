@@ -3,6 +3,7 @@ from handler import ping
 from handler import login
 from handler import item
 from handler import prescription
+from handler import train
 
 urls = (
     # ping 接口
@@ -31,5 +32,13 @@ urls = (
     # 修改一个处方里的一个训练项目
     ('^/v1/prescription/update_item$', prescription.UpdateItemHandler),
 
+    # 创建训练
+    ('^/v1/train/create$', train.CreateHandler),
+    # 训练详情
+    ('^/v1/train/info$', train.InfoHandler),
+    # 训练记录列表
+    ('^/v1/train/list$', train.ListHandler),
+    # 完成训练
+    ('^/v1/train/complete$', train.CompleteHandler),
 )
 
