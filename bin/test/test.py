@@ -39,7 +39,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_item_create(self):
         self.url = '/v1/item/create'
         self.send = {
-            "device_addr": "bt_v1",
             "name": '项目6',
             "item_type": 1,
             "content": "test"
@@ -53,7 +52,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_item_update(self):
         self.url = '/v1/item/update'
         self.send = {
-            "device_addr": "bt_v1",
             "name": '项目7',
             "item_type": 1,
             "content": "test",
@@ -68,7 +66,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_item_info(self):
         self.url = '/v1/item/info'
         self.send = {
-            "device_addr": "bt_v1",
             "id": 7,
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
@@ -81,7 +78,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_item_list(self):
         self.url = '/v1/item/list'
         self.send = {
-            "device_addr": "bt_v1",
             "size": 10,
             "page": 1,
         }
@@ -95,7 +91,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_create(self):
         self.url = '/v1/prescription/create'
         self.send = {
-            "device_addr": "bt_v1",
             "userid": 1276,
             "optometrist_id": 1199,
         }
@@ -108,7 +103,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_update(self):
         self.url = '/v1/prescription/update'
         self.send = {
-            "device_addr": "bt_v1",
             "id": 1,
             "userid": 1276,
             "optometrist_id": 1207,
@@ -123,7 +117,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_info(self):
         self.url = '/v1/prescription/info'
         self.send = {
-            "device_addr": "bt_v1",
             "id": 1,
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
@@ -147,7 +140,6 @@ class TestUyuInstrument(unittest.TestCase):
         }
         param_str = json.dumps(param)
         self.send = {
-            "device_addr": "bt_v1",
             "id": 1,
             "item_id": 2,
             "count": 2,
@@ -164,7 +156,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_del_item(self):
         self.url = '/v1/prescription/del_item'
         self.send = {
-            "device_addr": "bt_v1",
             "id": 1,
             "prescitemid": 1,
         }
@@ -190,7 +181,6 @@ class TestUyuInstrument(unittest.TestCase):
         }
         param_str = json.dumps(param)
         self.send = {
-            "device_addr": "bt_v1",
             "id": 1,
             "prescitemid": 2,
             "count": 2,
@@ -208,7 +198,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_create(self):
         self.url = '/v1/train/create'
         self.send = {
-            "device_addr": "bt_v1",
             "userid": 1276,
             "device_id": 111,
             "item_type": 2,
@@ -225,7 +214,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_info(self):
         self.url = '/v1/train/info'
         self.send = {
-            "device_addr": "bt_v1",
             "id": 2,
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
@@ -238,7 +226,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_list(self):
         self.url = '/v1/train/list'
         self.send = {
-            "device_addr": "bt_v1",
             "size": 10,
             "page": 1,
         }
@@ -252,7 +239,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         self.send = {
-            "device_addr": "bt_v1",
             "step": 3,
             "times": 40,
             "result": 'test result',
@@ -268,7 +254,6 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_complete(self):
         self.url = '/v1/train/close'
         self.send = {
-            "device_addr": "bt_v1",
             "id": 1,
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
