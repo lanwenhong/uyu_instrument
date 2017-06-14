@@ -42,6 +42,8 @@ urls = (
     ('^/v1/train/complete$', train.CompleteHandler),
     # 关闭训练
     ('^/v1/train/close$', train.CloseHandler),
+    # 获取训练设备二维码
+    ('^/v1/train/qrcode$', train.QrcodeHandler),
 
 )
 

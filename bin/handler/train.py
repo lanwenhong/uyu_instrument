@@ -32,7 +32,6 @@ class CreateHandler(core.Handler):
     def _post_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
-
     @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
     @with_validator_self
     def _post_handler(self):
@@ -78,13 +77,13 @@ class CreateHandler(core.Handler):
 
 
 class InfoHandler(core.Handler):
+
     _get_handler_fields = [
         Field('id', T_INT, False),
     ]
 
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
-
 
     @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
     @with_validator_self
@@ -97,7 +96,6 @@ class InfoHandler(core.Handler):
         if ret:
             return success(data=ret)
         return error(UAURET.DATAERR)
-
 
     def GET(self):
         try:
@@ -137,7 +135,6 @@ class ListHandler(core.Handler):
         params['page_num'] = page_num
         return success(data=params)
 
-
     def GET(self):
         try:
             self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
@@ -150,6 +147,7 @@ class ListHandler(core.Handler):
 
 
 class CompleteHandler(core.Handler):
+
     _post_handler_fields = [
         Field('id', T_INT, False),
         Field('step', T_INT, False),
@@ -159,7 +157,6 @@ class CompleteHandler(core.Handler):
 
     def _post_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
-
 
     @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
     @with_validator_self
@@ -177,7 +174,6 @@ class CompleteHandler(core.Handler):
             params.pop('result')
             return success(data=params)
         return error(UAURET.DATAERR)
-
 
     def POST(self):
         try:
@@ -212,11 +208,42 @@ class CloseHandler(core.Handler):
         params['state'] = define.UYU_TRAIN_STATE_CLOSE
         return success(data=params)
 
-
     def POST(self):
         try:
             self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
             ret = self._post_handler()
+            self.write(ret)
+        except Exception as e:
+            log.warn(e)
+            log.warn(traceback.format_exc())
+            return error(UAURET.SERVERERR)
+
+
+class QrcodeHandler(core.Handler):
+
+    _get_handler_fields = [
+        Field('device_id', T_INT, False)
+    ]
+
+    def _get_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
+
+    @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
+    @with_validator_self
+    def _get_handler(self):
+        if not self.device.sauth:
+            return error(UAURET.SESSIONERR)
+        params = self.validator.data
+        device_id = params.get('device_id')
+        qrcode_txt = 'http://baidu.com'
+        ret = tools.gen_qrcode_base64(qrcode_txt)
+        data = {'device_id': device_id, 'qrcode': qrcode_txt, 'qrcode_pic': ret}
+        return success(data=data)
+
+    def GET(self):
+        try:
+            self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
+            ret = self._get_handler()
             self.write(ret)
         except Exception as e:
             log.warn(e)

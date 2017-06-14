@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
 import json
+import qrcode
+import base64
+import StringIO
 import inspect
 import logging
 import datetime
@@ -421,3 +424,15 @@ def train_close(train_id):
         if ret == 1:
             return True
         return False
+
+
+def gen_qrcode_base64(qrcode_txt):
+    qr = qrcode.QRCode()
+    qr.add_data(qrcode_txt)
+    img = qr.make_image()
+    f = StringIO.StringIO()
+    img.save(f)
+    d = base64.b64encode(f.getvalue())
+    f.close()
+    ret = 'data:image/png;base64,' + d
+    return ret
