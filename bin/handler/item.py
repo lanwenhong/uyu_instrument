@@ -17,12 +17,11 @@ from config import cookie_conf
 import tools
 log = logging.getLogger()
 
-class CreateHandler(core.Handler):
-
+class CreateHandler(core.Handler): 
     _post_handler_fields = [
         Field('name', T_STR, False),
         Field('item_type', T_INT, False, match=r'^([0-1]){1}$'),
-        Field('content', T_STR, False),
+        # Field('content', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -36,7 +35,9 @@ class CreateHandler(core.Handler):
         params = self.validator.data
         name = params.get('name')
         item_type = params.get('item_type')
-        content = params.get('content')
+        if not self.req.input().has_key('content'):
+            return error(UAURET.PARAMERR)
+        content = self.req.input().get('content')
         ret = tools.item_create(name, item_type, content)
         log.debug('func item_create ret=%d', ret)
         if ret != None:
@@ -166,3 +167,4 @@ class ListHandler(core.Handler):
         except Exception as e:
             log.warn(e)
             log.warn(traceback.format_exc())
+            return error(UAURET.SERVERERR)

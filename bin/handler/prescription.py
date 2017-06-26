@@ -36,13 +36,20 @@ class CreateHandler(core.Handler):
         params = self.validator.data
         userid = params.get('userid')
         optometrist_id = params.get('optometrist_id')
-        flag = tools.verify_user(userid=userid)
+        flag = tools.verify_user(userid=userid, user_type=define.UYU_USER_ROLE_COMSUMER)
         if not flag:
             return error(UAURET.USERNOTEXISTS)
         flag = tools.verify_user(optometrist_id, define.UYU_USER_ROLE_EYESIGHT)
         if not flag:
             return error(UAURET.USERNOTEXISTS)
-        prescription_id = tools.prescription_create(userid, optometrist_id)
+        try:
+            prescription_id = tools.prescription_create(userid, optometrist_id)
+        except Exception as e:
+            log.warn(e)
+            if e[0] == 1062 and 'Duplicate' in e[1]:
+                return error(UAURET.DATAEXIST)
+            else:
+                raise
         if prescription_id is None:
             return error(UAURET.CREATEPRESCRIPTIONERR)
         params.update({'id': prescription_id})
@@ -79,7 +86,7 @@ class UpdateHandler(core.Handler):
         prescription_id = params.get('id')
         userid = params.get('userid')
         optometrist_id = params.get('optometrist_id')
-        flag = tools.verify_user(userid=userid)
+        flag = tools.verify_user(userid=userid, user_type=define.UYU_USER_ROLE_COMSUMER)
         if not flag:
             return error(UAURET.USERNOTEXISTS)
         flag = tools.verify_user(optometrist_id, define.UYU_USER_ROLE_EYESIGHT)
@@ -141,7 +148,7 @@ class AddItemHandler(core.Handler):
         Field('id', T_INT, False),
         Field('item_id', T_INT, False),
         Field('count', T_INT, False),
-        Field('train_type', T_INT, False, match=r'^([0-2]){1}$'),
+        # Field('train_type', T_INT, False, match=r'^([0-2]){1}$'),
         # Field('param', T_STR, False), # validator 解析带逗号的字符串出错
     ]
 
@@ -157,13 +164,6 @@ class AddItemHandler(core.Handler):
         prescription_id = params.get('id')
         item_id = params.get('item_id')
         count = params.get('count')
-        train_type = params.get('train_type')
-        if not self.req.input().has_key('param'):
-            return error(UAURET.PARAMERR)
-
-        param_str = self.req.input().get('param')
-        param = json.loads(param_str)
-
         ret = tools.verify_presc(prescription_id)
         if not ret:
             return error(UAURET.NODATA)
@@ -172,17 +172,16 @@ class AddItemHandler(core.Handler):
         if not ret:
             return error(UAURET.NODATA)
 
-        ret = tools.verify_param(param)
-        if not ret:
-            return error(UAURET.DATAERR)
+        # ret = tools.verify_param(param)
+        # if not ret:
+        #     return error(UAURET.DATAERR)
+        param_str = ret.get('content')
+        presc_item_id = tools.prescription_add_item(prescription_id, userid, item_id, count, param_str)
 
-        presc_item_id = tools.prescription_add_item(prescription_id, userid, item_id, count, train_type, param_str)
+        if presc_item_id is None:
+            return error(UAURET.PRESCADDITEMERR)
 
-        if ret is None:
-            return error()
-
-        params['prescitemid'] = presc_item_id
-        params['param'] = param
+        params['presc_item_id'] = presc_item_id
         return success(data=params)
 
 
@@ -201,7 +200,7 @@ class DelItemHandler(core.Handler):
 
     _post_handler_fields = [
         Field('id', T_INT, False),
-        Field('prescitemid', T_INT, False),
+        Field('presc_item_id', T_INT, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -214,7 +213,7 @@ class DelItemHandler(core.Handler):
             return error(UAURET.SESSIONERR)
         params = self.validator.data
         presc_id = params.get('id')
-        presc_item_id = params.get('prescitemid')
+        presc_item_id = params.get('presc_item_id')
         flag = tools.prescription_del_item(presc_id, presc_item_id)
         if flag:
             return success(data=params)
@@ -236,9 +235,9 @@ class UpdateItemHandler(core.Handler):
 
     _post_handler_fields = [
         Field('id', T_INT, False),
-        Field('prescitemid', T_INT, False),
+        Field('presc_item_id', T_INT, False),
         Field('count', T_INT, False),
-        Field('train_type', T_INT, False, match=r'^([0-2]){1}$'),
+        # Field('train_type', T_INT, False, match=r'^([0-2]){1}$'),
         # Field('param', T_STR, False), # validator 解析带逗号的字符串出错
     ]
 
@@ -252,23 +251,24 @@ class UpdateItemHandler(core.Handler):
             return error(UAURET.SESSIONERR)
         params = self.validator.data
         prescription_id = params.get('id')
-        presc_item_id = params.get('prescitemid')
+        presc_item_id = params.get('presc_item_id')
         count = params.get('count')
-        train_type = params.get('train_type')
-        if not self.req.input().has_key('param'):
-            return error(UAURET.PARAMERR)
+        # train_type = params.get('train_type')
+        # if not self.req.input().has_key('param'):
+        #     return error(UAURET.PARAMERR)
 
-        param_str = self.req.input().get('param')
-        param = json.loads(param_str)
-        ret = tools.verify_param(param)
-        if not ret:
-            return error(UAURET.DATAERR)
-        flag = tools.prescription_update_item(prescription_id, presc_item_id, count, train_type, param_str)
+        # param_str = self.req.input().get('param')
+        # param = json.loads(param_str)
+        # ret = tools.verify_param(param)
+        # if not ret:
+        #     return error(UAURET.DATAERR)
+        # flag = tools.prescription_update_item(prescription_id, presc_item_id, count, train_type, param_str)
+        flag = tools.prescription_update_item(prescription_id, presc_item_id, count)
         if flag:
             presc_item_info = tools.verify_presc_item(presc_item_id)
             item_id = presc_item_info.get('item_id')
             params['item_id'] = item_id
-            params['param'] = param
+            # params['param'] = param
             return success(data=params)
         return error(UAURET.DATAERR)
 

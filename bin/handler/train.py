@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import math
 import json
+import inspect
 import traceback
 from zbase.web import core
 from zbase.web import template
@@ -17,6 +18,7 @@ from runtime import g_rt
 from config import cookie_conf
 import tools
 log = logging.getLogger()
+
 
 class CreateHandler(core.Handler):
 
@@ -112,7 +114,8 @@ class ListHandler(core.Handler):
 
     _get_handler_fields = [
         Field('size', T_INT, False),
-        Field('page', T_INT, False)
+        Field('page', T_INT, False),
+        Field('userid', T_INT, True)
     ]
 
     def _get_handler_errfunc(self, msg):
@@ -127,9 +130,10 @@ class ListHandler(core.Handler):
         params = self.validator.data
         size = params.get('size')
         page = params.get('page')
+        userid = params.get('userid')
         offset, limit = tools.gen_offset(page, size)
-        ret = tools.train_list(offset, limit)
-        total = tools.train_total()
+        ret = tools.train_list(offset, limit, userid)
+        total = tools.train_total(userid)
         page_num = int(math.ceil(float(total) / float(size)))
         params['trains'] = ret
         params['page_num'] = page_num
@@ -151,8 +155,10 @@ class CompleteHandler(core.Handler):
     _post_handler_fields = [
         Field('id', T_INT, False),
         Field('step', T_INT, False),
+        Field('name', T_STR, False),
+        Field('item_id', T_INT, False),
         Field('times', T_INT, True),
-        Field('result', T_STR, False),
+        # Field('result', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -166,12 +172,33 @@ class CompleteHandler(core.Handler):
         params = self.validator.data
         train_id = params.get('id')
         step = params.get('step')
+        name = params.get('name')
         times = params.get('times')
-        result = params.get('result')
-        flag = tools.train_complete(train_id, step, result, times)
+        item_id = params.get('item_id')
+
+        if not self.req.input().has_key('result'):
+            return error(UAURET.PARAMERR)
+        result = self.req.input().get('result')
+
+        ret = tools.verify_train(train_id)
+        if not ret:
+            log.debug('func=%s|train_id=%s|invalid', inspect.stack()[0][3], train_id)
+            return error(UAURET.DATAERR)
+
+        presc_id = ret.get('presc_id')
+        items = [item['item_id'] for item in tools.get_all_presc_item(presc_id)]
+        log.debug('func=%s|train_id=%s|items=%s', inspect.stack()[0][3], train_id, items)
+        if int(item_id) not in items:
+            log.debug('func=%s|item_id=%s|invalid', inspect.stack()[0][3], item_id)
+            return error(UAURET.DATAERR)
+
+        flag = tools.check_result(name, result)
+        if not flag:
+            return error(UAURET.DATAERR)
+
+        flag = tools.train_complete(train_id, step, result, name, presc_id, item_id, times)
         if flag:
             params.pop('times')
-            params.pop('result')
             return success(data=params)
         return error(UAURET.DATAERR)
 

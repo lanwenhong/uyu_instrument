@@ -33,10 +33,125 @@ PARAM_EYE_TYPE_MAP = {
     '2': '双眼'
 }
 
+CHECK_ITEM_NAME = {
+    '视力检查': {
+        'keys': {
+            'seq': {
+                'must': ['optic', 'font_size', 'vision', 'eye'],
+                'option': []
+            },
+            'glasses': 'true'
+        }
+    },
+    '红绿检查': {
+        'keys': {
+            'seq': {
+                'must': ['eye', 'color'],
+                'option': []
+            },
+            'glasses': 'true'
+        }
+    },
+    'worth4点': {
+        'keys': {
+            'seq': {
+                'must': ['optic', 'pic_num'],
+                'option': ['pic_pos']
+            }
+        }
+    },
+    '眼位测量': {
+        'keys': {
+            'seq': {
+                'must': ['optic', 'overlap_dis1', 'overlap_dis2', 'overlap_dis'],
+                'option': []
+            }
+        }
+    },
+    '眼位测量2': {
+        'keys': {
+            'seq': {
+                'must': ['optic', 'pos'],
+                'option': []
+            }
+        }
+    },
+    '融像检查': {
+        'keys': {
+            'seq': {
+                'must': ['optic', 'picdisblur', 'picdisburst', 'picdisrecover'],
+                'option': []
+            }
+        }
+    },
+    '调节功能检查': {
+        'keys': {
+            'seq': {
+                'must': ['adjust', 'eye', 'optic', 'pad_dis'],
+                'option': ['excite']
+            }
+        }
+    },
+    '调节灵敏度': {
+        'keys': {
+            'seq': {
+                'must': ['eye', 'cycle'],
+                'option': []
+            }
+        }
+    },
+    '聚散灵敏度': {
+        'keys': {
+            'seq': {
+                'must': ['cycle'],
+                'option': []
+            }
+        }
+    },
+    '色觉检查': {
+        'keys': {
+            'seq': {
+                'must': ['color', 'color_sense'],
+                'option': []
+            }
+        }
+    },
+    '立体视检查': {
+        'keys': {
+            'seq': {
+                'must': ['pic_name'],
+                'option': []
+            }
+        }
+    }
+}
+
+def check_result(name, result):
+    flag = True
+    result = json.loads(result)
+    check = CHECK_ITEM_NAME.get(name)['keys']
+    if 'glasses' in check.keys():
+        if result['glasses'] not in ('true', 'false'):
+            log.warn('func=%s|key=%s|vlaue=%s|invalid', 'check_result', 'glasses', result['glasses'])
+            return False
+    seq = result['seq']
+    if not isinstance(seq, list):
+        log.warn('func=%s|key=%s|invalid', 'check_result', 'seq')
+        return False
+    must_keyes = check['seq']['must']
+    for item in seq:
+        for key in must_keyes:
+            if not item.has_key(key):
+                log.warn('func=%s|key=%s|not exist', 'check_result', key)
+                flag = False
+                break
+    return flag
+
+
 def gen_offset(page, maxnum):
-     limit = maxnum
-     offset = (page -1) * maxnum
-     return offset, limit
+    limit = maxnum
+    offset = (page -1) * maxnum
+    return offset, limit
 
 
 def get_current_func():
@@ -139,6 +254,13 @@ def verify_presc_item(presc_item_id):
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         return ret
 
+def verify_train(train_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'id': train_id}
+        ret = conn.select_one(table='train', fields='*', where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
 
 def get_channel_info(channel_id):
     with get_connection_exception('uyu_core') as conn:
@@ -167,7 +289,7 @@ def get_user_presc(userid):
 def get_all_presc_item(presc_id):
     with get_connection_exception('uyu_core') as conn:
         where = {'presc_id': presc_id}
-        ret = conn.select(table='presc_items', fields=['id'], where=where)
+        ret = conn.select(table='presc_items', fields='*', where=where)
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         return ret
 
@@ -177,10 +299,9 @@ def get_presc_item_content(presc_id):
     items = get_all_presc_item(presc_id)
     with get_connection_exception('uyu_core') as conn:
         for item in items:
-            item_id = item['id']
+            item_id = item['item_id']
             ret = conn.select_one(table='item', fields=['content'], where={'id': item_id})
             content.append(ret['content'])
-
         return content
 
 
@@ -206,7 +327,7 @@ def item_update(name, item_type, content, item_id):
     with get_connection_exception('uyu_core') as conn:
         now = datetime.datetime.now()
         where = {'id': item_id}
-        values = {'name': name, 'item_type': item_type, 'content': content}
+        values = {'name': name, 'item_type': item_type, 'content': content, 'utime': now}
         ret = conn.update(table='item', values=values, where=where)
         log.debug('func=%s|db ret=%d', inspect.stack()[0][3], ret)
         if ret == 1:
@@ -281,7 +402,7 @@ def prescription_info(prescription_id):
         return presc_info, items
 
 
-def prescription_add_item(prescription_id, userid, item_id, count, train_type,  param):
+def prescription_add_item(prescription_id, userid, item_id, count, param_str):
     with get_connection_exception('uyu_core') as conn:
         now = datetime.datetime.now()
         values = {
@@ -289,8 +410,7 @@ def prescription_add_item(prescription_id, userid, item_id, count, train_type,  
             'userid': userid,
             'item_id': item_id,
             'count': count,
-            'train_type': train_type,
-            'params': param,
+            'params': param_str,
             'ctime': now,
             'utime': now,
         }
@@ -315,11 +435,11 @@ def prescription_del_item(presc_id, presc_item_id):
         return False
 
 
-def prescription_update_item(presc_id, presc_item_id, count, train_type, param_str):
+def prescription_update_item(presc_id, presc_item_id, count):
     with get_connection_exception('uyu_core') as conn:
         now = datetime.datetime.now()
         where = {'presc_id': presc_id, 'id': presc_item_id}
-        values = {'count': count, 'train_type': train_type, 'params': param_str, 'utime': now}
+        values = {'count': count, 'utime': now}
         ret = conn.update(table='presc_items', values=values, where=where)
         log.debug('func=%s|db ret=%d', inspect.stack()[0][3], ret)
         if ret == 1:
@@ -339,7 +459,6 @@ def train_create(param, channel_id, store_id, presc_id):
         param['state'] = define.UYU_TRAIN_STATE_START
         param['step'] = 0
         param['times'] = 0
-        param['result'] = ''
         param['presc_content'] = json.dumps(content)
         param['ctime'] = now
         param['utime'] = now
@@ -371,10 +490,13 @@ def train_info(train_id):
 
 
 
-def train_list(offset, limit):
+def train_list(offset, limit, userid=''):
     with get_connection_exception('uyu_core') as conn:
+        where = {}
+        if userid not in ('', None):
+            where['userid'] = userid
         other = ' order by ctime desc limit %d offset %d' % (limit, offset)
-        ret = conn.select(table='train', fields='*', other=other)
+        ret = conn.select(table='train', fields='*', where=where, other=other)
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         if ret:
             for item in ret:
@@ -384,21 +506,32 @@ def train_list(offset, limit):
         return ret
 
 
-def train_total():
+def train_total(userid=''):
     with get_connection_exception('uyu_core') as conn:
-        sql = 'select count(*) as total from train where ctime>0'
-        ret = conn.get(sql)
+        where = {'ctime': ('>', 0)}
+        if userid not in ('', None):
+            where['userid'] = userid
+        # sql = 'select count(*) as total from train where ctime>0'
+        # ret = conn.get(sql)
+        ret = conn.select(table='train', fields='count(*) as total', where=where) 
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
-        return int(ret['total']) if ret['total'] else 0
+        return int(ret[0]['total']) if ret[0]['total'] else 0
 
 
-def train_complete(train_id, step, result, times=''):
+def train_complete(train_id, step, result, name, presc_id, item_id, times=''):
     with get_connection_exception('uyu_core') as conn:
+        ret = conn.select(table='result', fields='*', where={
+            'train_id': train_id, 
+            'presc_id': presc_id,
+            'item_id': item_id
+        })
+        if ret:
+            return False
+
         now = datetime.datetime.now()
         where = {'id': train_id}
         values = {
             'step': step,
-            'result': result,
             'state': define.UYU_TRAIN_STATE_END,
             'utime': now
         }
@@ -406,9 +539,19 @@ def train_complete(train_id, step, result, times=''):
             values['times'] = times
         ret = conn.update(table='train', values=values, where=where)
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
-        if ret == 1:
-            return True
-        return False
+        if ret != 1:
+            return False
+        ret = conn.insert(table='result', values={
+            'train_id': train_id,
+            'presc_id': presc_id,
+            'item_id': item_id,
+            'result': result,
+            'ctime': now,
+            'utime': now
+        })
+        if ret != 1:
+            return False
+        return True
 
 
 def train_close(train_id):
