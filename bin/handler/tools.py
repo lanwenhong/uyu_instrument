@@ -305,6 +305,13 @@ def get_presc_item_content(presc_id):
         return content
 
 
+def get_train_result(train_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'train_id': train_id}
+        ret = conn.select(table='result', fields=['result'], where=where)
+        return ret
+
+
 def item_create(name, item_type, content):
     with get_connection_exception('uyu_core') as conn:
         now = datetime.datetime.now()
@@ -471,15 +478,17 @@ def train_create(param, channel_id, store_id, presc_id):
 
 
 def train_info(train_id):
+    result = get_train_result(train_id)
     with get_connection_exception('uyu_core') as conn:
         where = {'id': train_id}
         keep_fields = [
             'id', 'userid', 'channel_id', 'store_id',
             'device_id', 'presc_content', 'item_type',
             'state', 'step', 'lng', 'lat', 'times',
-            'result', 'ctime', 'utime'
+            'ctime', 'utime'
         ]
         ret = conn.select_one(table='train', fields=keep_fields, where=where)
+        ret['result'] = [item['result'] for item in result]
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         if ret:
             ret['ctime'] = datetime.datetime.strftime(ret['ctime'], '%Y-%m=%d %H:%M:%S')
@@ -487,7 +496,6 @@ def train_info(train_id):
                 ret['utime'] = datetime.datetime.strftime(ret['utime'], '%Y-%m=%d %H:%M:%S')
 
         return ret
-
 
 
 def train_list(offset, limit, userid=''):
@@ -500,6 +508,11 @@ def train_list(offset, limit, userid=''):
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         if ret:
             for item in ret:
+                result = get_train_result(item['id'])
+                if result:
+                    item['result'] = [r['result'] for r in result]
+                else:
+                    item['result'] = []
                 item['ctime'] = datetime.datetime.strftime(item['ctime'], '%Y-%m=%d %H:%M:%S')
                 if item['utime']:
                     item['utime'] = datetime.datetime.strftime(item['utime'], '%Y-%m=%d %H:%M:%S')

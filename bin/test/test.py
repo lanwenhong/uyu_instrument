@@ -200,7 +200,7 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_info(self):
         self.url = '/v1/train/info'
         self.send = {
-            "id": 2,
+            "id": 3,
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -222,7 +222,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         result = {
@@ -269,7 +269,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_qrcode(self):
         self.url = '/v1/train/qrcode'
         self.send = {
