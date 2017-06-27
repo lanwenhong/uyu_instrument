@@ -60,4 +60,9 @@ PORT = 8088
 redis_url = 'redis://127.0.0.1:4600/0'
 #cookie 配置
 cookie_conf = { 'expires':60*60*24*3, 'max_age':60*60*24*3, 'domain':'121.40.177.111', 'path':'/instrument'}
-
+API_SERVER = {
+    'url': '/internal/v1/api/consumer_change',
+    'port': 8087,
+    'host': '127.0.0.1',
+    'timeout': 2000
+}

@@ -7,7 +7,10 @@ import StringIO
 import inspect
 import logging
 import datetime
+import config
 from zbase.base.dbpool import get_connection_exception
+from zbase.base.http_client import RequestsClient
+from zbase.server.client import HttpClient
 from uyubase.uyu import define
 log = logging.getLogger()
 
@@ -312,6 +315,13 @@ def get_train_result(train_id):
         return ret
 
 
+def get_store_info(store_id):
+    with get_connection_exception('uyu_core') as conn:
+        where = {'id': store_id}
+        ret = conn.select_one(table='stores', fields='*', where=where)
+        return ret
+
+
 def item_create(name, item_type, content):
     with get_connection_exception('uyu_core') as conn:
         now = datetime.datetime.now()
@@ -592,3 +602,29 @@ def gen_qrcode_base64(qrcode_txt):
     f.close()
     ret = 'data:image/png;base64,' + d
     return ret
+
+
+def call_api_change(userid, store_userid, training_times, device_id, train_id):
+    flag = True
+    data = {
+        'userid': userid,
+        'store_userid': store_userid,
+        'training_times': training_times,
+        'device_id': device_id,
+        'train_id': train_id
+    }
+    url = config.API_SERVER['url']
+    port = config.API_SERVER['port']
+    host = config.API_SERVER['host']
+    timeout = config.API_SERVER['timeout']
+    server = [{'addr': (host, port), 'timeout': timeout}]
+    client = HttpClient(server, client_class=RequestsClient)
+    ret = client.post(url, data)
+    log.debug('func=%s|post ret=%s', inspect.stack()[0][3], ret)
+    result = json.loads(ret)
+    respcd = result.get('respcd')
+    if respcd != '0000':
+        flag = False
+    log.debug('func=%s|ret=%s', inspect.stack()[0][3], flag)
+    return flag
+

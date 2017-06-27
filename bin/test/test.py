@@ -180,7 +180,7 @@ class TestUyuInstrument(unittest.TestCase):
 
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_create(self):
         self.url = '/v1/train/create'
         self.send = {
@@ -269,7 +269,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_qrcode(self):
         self.url = '/v1/train/qrcode'
         self.send = {

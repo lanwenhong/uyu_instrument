@@ -57,6 +57,8 @@ class CreateHandler(core.Handler):
         if store_id == None or channel_id == None:
             log.warn('device no bind device_id=%s|channel_id=%s|store_id=%s|', device_id, channel_id, store_id)
             return error(UAURET.DEVICEUNBINDERR)
+        ret = tools.get_store_info(store_id)
+        store_userid = ret['userid']
         ret = tools.get_user_presc(userid)
         if not ret:
             return error(UAURET.USERNOPRESCERR)
@@ -65,6 +67,9 @@ class CreateHandler(core.Handler):
         if train_id is None:
             return error(UAURET.DATAERR)
         params['id'] = train_id
+        flag = tools.call_api_change(userid, store_userid, 1, device_id, train_id)
+        if not flag:
+            return error(UAURET.SUBTIMESERR)
         return success(data=params)
 
     def POST(self):
