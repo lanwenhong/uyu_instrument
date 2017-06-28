@@ -50,8 +50,8 @@ class TestUyuInstrument(unittest.TestCase):
         }
         param_str = json.dumps(param)
         self.send = {
-            "name": '项目9',
-            "item_type": 1,
+            "name": '项目13',
+            "item_type": 2,
             "content": param_str
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
@@ -140,10 +140,9 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_add_item(self):
         self.url = '/v1/prescription/add_item'
         self.send = {
-            "id": 5,
-            "item_id": 2,
+            "id": 1,
+            "item_id": 12,
             "count": 2,
-            "train_type": 0,
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -180,7 +179,7 @@ class TestUyuInstrument(unittest.TestCase):
 
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_create(self):
         self.url = '/v1/train/create'
         self.send = {
@@ -222,33 +221,161 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
+        # 视力检查
+        # result = {
+        #     "seq": 
+        #         [
+        #             {
+        #                 "font_size": 10,
+        #                 "eye": "l",
+        #                 "optic": 250,
+        #                 "vision": 0.8
+        #             }, 
+        #             {
+        #                 "font_size": 12,
+        #                 "eye": "r",
+        #                 "optic": 250,
+        #                 "vision": 0.8
+        #             }
+        #         ], 
+        #     "glasses": 'true'
+        # }
+
+        # 红绿检查
+        # result = {
+        #     "seq": [
+        #         {
+        #             "color": "r",
+        #             "eye": "l"
+        #         },
+        #         {
+        #             "color": "b",
+        #             "eye": "r"
+        #         }
+        #     ],
+        #     "glasses": 'true'
+        # }
+        # worth4点
+        # result = {
+        #     "seq": [
+        #         {
+        #             "pic_num": 3,
+        #             "optic": 250
+        #         },
+        #         {
+        #             "pic_pos": "lr",
+        #             "pic_num": 5,
+        #             "optic": 0
+        #         }
+        #     ]
+        # }
+        # 眼位测量
+        # result = {
+        #     "seq": [
+        #         {
+        #             "overlap_dis2": -1,
+        #             "overlap_dis1": 2,
+        #             "optic": 250
+        #         },
+        #         {
+        #             "overlap_dis2": -2,
+        #             "overlap_dis1": 3,
+        #             "optic": 250
+        #         }
+        #     ] 
+        # }
+        # 融像检查
+        # result = {
+        #     "seq": [
+        #         {
+        #             "pic_dis_burst": 2,
+        #             "pic_dis_recover": 3,
+        #             "optic": 250,
+        #             "pic_dis_blur": 1
+        #         },
+        #         {
+        #             "pic_dis_burst": 2,
+        #             "pic_dis_recover": 3,
+        #             "optic": 250,
+        #             "pic_dis_blur": 1
+        #         }
+        #     ]
+        # }
+        # 眼位测量2
+        # result = {
+        #     "seq": [
+        #         {
+        #             "pos": 15,
+        #             "optic": 250
+        #         },
+        #         {
+        #             "pos": 14,
+        #             "optic": 250
+        #         },
+        #         {
+        #             "pos": 13,
+        #             "optic": 250
+        #         },
+        #     ]
+        # }
+        # 调节功能检查
+        # result = {
+        #     "seq": [
+        #         {
+        #             "pad_dis": 20,
+        #             "adjust": "r",
+        #             "eye": "l",
+        #             "optic": 250
+        #         }
+        #     ]
+        # }
+        # 调节灵敏度
+        # result = {
+        #     "seq": [
+        #         {
+        #             "eye": "l",
+        #             "cycle": 10
+        #         },
+        #         {
+        #             "eye": "r",
+        #             "cycle": 15
+        #         },
+        #     ]
+        # }
+        # 聚散灵敏度
+        # result = {
+        #     "seq": [
+        #         {
+        #             "cycle": 10
+        #         }
+        #     ]
+        # }
+        # 色觉检查
+        # result = {
+        #     "seq": [
+        #         {
+        #             "color": "r",
+        #             "color_sense": 1
+        #         }
+        #     ]
+        # }
+        # 立体视检查
         result = {
-            "seq": 
-                [
-                    {
-                        "font_size": 10,
-                        "eye": "l",
-                        "optic": 250,
-                        "vision": 0.8
-                    }, 
-                    {
-                        "font_size": 12,
-                        "eye": "r",
-                        "optic": 250,
-                        "vision": 0.8
-                    }
-                ], 
-            "glasses": 'true'
+            "seq": [
+                {
+                    "pic_name": "a.jpg"
+                }
+            ]
         }
         self.send = {
-            "step": 3,
-            "times": 40,
+            "step": 2,
+            "times": 10,
             "result": json.dumps(result),
-            "name": '视力检查',
-            "item_id": 1,
+            "name": '立体视检查',
+            "item_id": 11,
             "id": 3,
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)

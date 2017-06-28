@@ -67,9 +67,10 @@ class CreateHandler(core.Handler):
         if train_id is None:
             return error(UAURET.DATAERR)
         params['id'] = train_id
-        flag = tools.call_api_change(userid, store_userid, 1, device_id, train_id)
-        if not flag:
-            return error(UAURET.SUBTIMESERR)
+        if item_type == define.UYU_ITEM_TYPE_TRAIN:
+            flag = tools.call_api_change(userid, store_userid, 1, device_id, train_id)
+            if not flag:
+                return error(UAURET.SUBTIMESERR)
         return success(data=params)
 
     def POST(self):
@@ -184,6 +185,7 @@ class CompleteHandler(core.Handler):
         if not self.req.input().has_key('result'):
             return error(UAURET.PARAMERR)
         result = self.req.input().get('result')
+        result = json.loads(result)
 
         ret = tools.verify_train(train_id)
         if not ret:

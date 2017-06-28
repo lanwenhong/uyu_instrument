@@ -66,10 +66,11 @@ CHECK_ITEM_NAME = {
     '眼位测量': {
         'keys': {
             'seq': {
-                'must': ['optic', 'overlap_dis1', 'overlap_dis2', 'overlap_dis'],
+                'must': ['optic', 'overlap_dis1', 'overlap_dis2'],
                 'option': []
             }
-        }
+        },
+        'func': 'eye_level_measurement'
     },
     '眼位测量2': {
         'keys': {
@@ -82,7 +83,7 @@ CHECK_ITEM_NAME = {
     '融像检查': {
         'keys': {
             'seq': {
-                'must': ['optic', 'picdisblur', 'picdisburst', 'picdisrecover'],
+                'must': ['optic', 'pic_dis_blur', 'pic_dis_burst', 'pic_dis_recover'],
                 'option': []
             }
         }
@@ -93,7 +94,8 @@ CHECK_ITEM_NAME = {
                 'must': ['adjust', 'eye', 'optic', 'pad_dis'],
                 'option': ['excite']
             }
-        }
+        },
+        'func': 'calc_excite'
     },
     '调节灵敏度': {
         'keys': {
@@ -131,7 +133,6 @@ CHECK_ITEM_NAME = {
 
 def check_result(name, result):
     flag = True
-    result = json.loads(result)
     check = CHECK_ITEM_NAME.get(name)['keys']
     if 'glasses' in check.keys():
         if result['glasses'] not in ('true', 'false'):
@@ -148,6 +149,12 @@ def check_result(name, result):
                 log.warn('func=%s|key=%s|not exist', 'check_result', key)
                 flag = False
                 break
+    f_n = CHECK_ITEM_NAME.get(name).get('func', None)
+    if f_n:
+        func_map = globals()
+        func = func_map.get(f_n)
+        if callable(func):
+            func(result)
     return flag
 
 
@@ -543,14 +550,6 @@ def train_total(userid=''):
 
 def train_complete(train_id, step, result, name, presc_id, item_id, times=''):
     with get_connection_exception('uyu_core') as conn:
-        ret = conn.select(table='result', fields='*', where={
-            'train_id': train_id, 
-            'presc_id': presc_id,
-            'item_id': item_id
-        })
-        if ret:
-            return False
-
         now = datetime.datetime.now()
         where = {'id': train_id}
         values = {
@@ -561,19 +560,35 @@ def train_complete(train_id, step, result, name, presc_id, item_id, times=''):
         if times:
             values['times'] = times
         ret = conn.update(table='train', values=values, where=where)
-        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        log.debug('func=%s|update train|ret=%s', inspect.stack()[0][3], ret)
         if ret != 1:
             return False
-        ret = conn.insert(table='result', values={
-            'train_id': train_id,
+        ret = conn.select_one(table='result', fields='*', where={
+            'train_id': train_id, 
             'presc_id': presc_id,
-            'item_id': item_id,
-            'result': result,
-            'ctime': now,
-            'utime': now
+            'item_id': item_id
         })
-        if ret != 1:
-            return False
+        if ret:
+            ret = conn.update(
+                table='result', 
+                values={'result': json.dumps(result), 'utime': now},
+                where={'id': ret['id']}
+            )
+            log.debug('func=%s|update result|ret=%s', inspect.stack()[0][3], ret)
+            if ret != 1:
+                return False
+        else:
+            ret = conn.insert(table='result', values={
+                'train_id': train_id,
+                'presc_id': presc_id,
+                'item_id': item_id,
+                'result': json.dumps(result),
+                'ctime': now,
+                'utime': now
+            })
+            log.debug('func=%s|insert result|ret=%s', inspect.stack()[0][3], ret)
+            if ret != 1:
+                return False
         return True
 
 
@@ -628,3 +643,21 @@ def call_api_change(userid, store_userid, training_times, device_id, train_id):
     log.debug('func=%s|ret=%s', inspect.stack()[0][3], flag)
     return flag
 
+
+def eye_level_measurement(data):
+    # 暂时返回一个固定的
+    finish = [
+        {"optic":250, "overlap_dis": 1},
+        {"optic":0, "overlap_dis": 2}
+    ]
+    data["result"] = finish
+    log.debug('func=%s|ret=%s', inspect.stack()[0][3], data)
+    return data
+
+
+def calc_excite(data):
+    # 暂时返回一个固定的
+    for item in data['seq']:
+        item['excite'] = 1
+    log.debug('func=%s|ret=%s', inspect.stack()[0][3], data)
+    return data
