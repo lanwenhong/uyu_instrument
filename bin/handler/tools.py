@@ -148,7 +148,7 @@ def check_result(name, result):
             if not item.has_key(key):
                 log.warn('func=%s|key=%s|not exist', 'check_result', key)
                 flag = False
-                break
+                return flag
     f_n = CHECK_ITEM_NAME.get(name).get('func', None)
     if f_n:
         func_map = globals()
