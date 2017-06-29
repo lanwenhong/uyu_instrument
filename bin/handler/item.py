@@ -38,6 +38,8 @@ class CreateHandler(core.Handler):
         if not self.req.input().has_key('content'):
             return error(UAURET.PARAMERR)
         content = self.req.input().get('content')
+        if not tools.verify_item_type(item_type):
+            return error(UAURET.DATAERR)
         ret = tools.item_create(name, item_type, content)
         log.debug('func item_create ret=%d', ret)
         if ret != None:
@@ -63,7 +65,7 @@ class UpdateHandler(core.Handler):
         Field('id', T_INT, False),
         Field('name', T_STR, False),
         Field('item_type', T_INT, False, match=r'^([0-1]){1}$'),
-        Field('content', T_STR, False),
+        # Field('content', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -78,7 +80,11 @@ class UpdateHandler(core.Handler):
         item_id = params.get('id')
         name = params.get('name')
         item_type = params.get('item_type')
-        content = params.get('content')
+        if not self.req.input().has_key('content'):
+            return error(UAURET.PARAMERR)
+        content = self.req.input().get('content')
+        if not tools.verify_item_type(item_type):
+            return error(UAURET.DATAERR)
         ret = tools.item_update(name, item_type, content, item_id)
         if ret:
             return success(data=params)

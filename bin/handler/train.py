@@ -52,6 +52,7 @@ class CreateHandler(core.Handler):
         if not ret:
             log.warn('device invalid device_id=%s', device_id)
             return error(UAURET.DATAERR)
+        blooth_tag = ret.get('blooth_tag')
         channel_id = ret.get('channel_id', None)
         store_id = ret.get('store_id', None)
         if store_id == None or channel_id == None:
@@ -71,6 +72,8 @@ class CreateHandler(core.Handler):
             flag = tools.call_api_change(userid, store_userid, 1, device_id, train_id)
             if not flag:
                 return error(UAURET.SUBTIMESERR)
+        push_content = 'test'
+        tools.push_msg(blooth_tag, push_content)
         return success(data=params)
 
     def POST(self):

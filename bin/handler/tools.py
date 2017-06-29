@@ -21,7 +21,6 @@ PARAMS_KEY_INT = [
 
 PARAMS_KEY_STR = ['left_eye_level', 'right_eye_level']
 
-
 PARAMS_KEY = PARAMS_KEY_INT + PARAMS_KEY_STR
 
 PARAM_TRADE_TYPE_MAP = {
@@ -168,6 +167,11 @@ def get_current_func():
     return sys._getframe().f_code.co_name
 
 
+def verify_item_type(item_type):
+    if int(item_type) not in (define.UYU_ITEM_CHECK, define.UYU_ITEM_TRAIN):
+        return False
+
+
 def verify_trade_type(trade_type):
     if str(trade_type) in PARAM_TRADE_TYPE_MAP.keys():
         return True
@@ -263,6 +267,7 @@ def verify_presc_item(presc_item_id):
         ret = conn.select_one(table='presc_items', fields='*', where={'id': presc_item_id})
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         return ret
+
 
 def verify_train(train_id):
     with get_connection_exception('uyu_core') as conn:
@@ -415,6 +420,7 @@ def prescription_update(prescription_id, userid, optometrist_id):
         if ret == 1:
             return True
         return False
+
 
 def prescription_info(prescription_id):
     with get_connection_exception('uyu_core') as conn:
@@ -661,3 +667,19 @@ def calc_excite(data):
         item['excite'] = 1
     log.debug('func=%s|ret=%s', inspect.stack()[0][3], data)
     return data
+
+
+def push_msg(blooth_tag, msg):
+    try:
+        data = {'dev': blooth_tag, 'msg': msg}
+        url = config.PUSH_SERVER['url']
+        port = config.PUSH_SERVER['port']
+        host = config.PUSH_SERVER['host']
+        timeout = config.PUSH_SERVER['timeout']
+        server = [{'addr': (host, port), 'timeout': timeout}]
+        client = HttpClient(server, client_class=RequestsClient)
+        ret = client.post(url, data)
+        log.debug('func=%s|post ret=%s', inspect.stack()[0][3], ret)
+    except Exception as e:
+        log.warn(e)
+        log.warn(traceback.format_exc())
