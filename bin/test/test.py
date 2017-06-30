@@ -179,7 +179,7 @@ class TestUyuInstrument(unittest.TestCase):
 
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_create(self):
         self.url = '/v1/train/create'
         self.send = {

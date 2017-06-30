@@ -588,6 +588,7 @@ def train_complete(train_id, step, result, name, presc_id, item_id, times=''):
                 'train_id': train_id,
                 'presc_id': presc_id,
                 'item_id': item_id,
+                'name': name,
                 'result': json.dumps(result),
                 'ctime': now,
                 'utime': now
@@ -669,9 +670,9 @@ def calc_excite(data):
     return data
 
 
-def push_msg(blooth_tag, msg):
+def push_msg(token, data):
     try:
-        data = {'dev': blooth_tag, 'msg': msg}
+        data = {'token': token, 'msg': json.dumps(data)}
         url = config.PUSH_SERVER['url']
         port = config.PUSH_SERVER['port']
         host = config.PUSH_SERVER['host']

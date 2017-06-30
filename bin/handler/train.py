@@ -68,12 +68,18 @@ class CreateHandler(core.Handler):
         if train_id is None:
             return error(UAURET.DATAERR)
         params['id'] = train_id
+        token = self.device.se.sk
+        push_data = {"msgid": train_id, "data": {}}
         if item_type == define.UYU_ITEM_TYPE_TRAIN:
+            push_data["type"] = "train"
+            push_data["data"]["id"] = train_id
             flag = tools.call_api_change(userid, store_userid, 1, device_id, train_id)
             if not flag:
                 return error(UAURET.SUBTIMESERR)
-        push_content = 'test'
-        tools.push_msg(blooth_tag, push_content)
+        else:
+            push_data["type"] = "inspect"
+            push_data["data"]["id"] = train_id
+        tools.push_msg(token, push_data)
         return success(data=params)
 
     def POST(self):
