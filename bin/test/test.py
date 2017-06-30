@@ -22,9 +22,9 @@ class TestUyuInstrument(unittest.TestCase):
 
     @unittest.skip("skipping")
     def test_device_login(self):
-        self.url = '/login'
+        self.url = '/v1/device/auth'
         self.send = {
-            "device_addr": "bt_v1",
+            "device_addr": "11:22:33:44:44",
             "password": 123456
         }
         ret = self.client.get(self.url, self.send)

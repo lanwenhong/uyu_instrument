@@ -9,7 +9,7 @@ urls = (
     # ping 接口
     ('/ping', ping.Ping),
     # 设备登录接口
-    ('^/login$', login.LoginHandler),
+    ('^/v1/device/auth$', login.LoginHandler),
     # 创建项目
     ('^/v1/item/create$', item.CreateHandler),
     # 修改项目
