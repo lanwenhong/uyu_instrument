@@ -68,7 +68,7 @@ API_SERVER = {
 }
 PUSH_SERVER = {
     'url': '/v1/msg/push',
-    'port': 8012,
+    'port': 8090,
     'host': '127.0.0.1',
     'timeout': 2000
 }

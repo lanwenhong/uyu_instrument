@@ -23,6 +23,7 @@ class CreateHandler(core.Handler):
     _post_handler_fields = [
         Field('userid', T_INT, False),
         Field('optometrist_id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -72,6 +73,7 @@ class UpdateHandler(core.Handler):
         Field('id', T_INT, False),
         Field('userid', T_INT, False),
         Field('optometrist_id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -111,7 +113,8 @@ class UpdateHandler(core.Handler):
 class InfoHandler(core.Handler):
 
     _get_handler_fields = [
-        Field('id', T_INT, False)
+        Field('id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):
@@ -148,6 +151,7 @@ class AddItemHandler(core.Handler):
         Field('id', T_INT, False),
         Field('item_id', T_INT, False),
         Field('count', T_INT, False),
+        Field('token', T_STR, False),
         # Field('train_type', T_INT, False, match=r'^([0-2]){1}$'),
         # Field('param', T_STR, False), # validator 解析带逗号的字符串出错
     ]
@@ -182,6 +186,7 @@ class AddItemHandler(core.Handler):
             return error(UAURET.PRESCADDITEMERR)
 
         params['presc_item_id'] = presc_item_id
+        params.pop('token')
         return success(data=params)
 
 
@@ -201,6 +206,7 @@ class DelItemHandler(core.Handler):
     _post_handler_fields = [
         Field('id', T_INT, False),
         Field('presc_item_id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -216,7 +222,7 @@ class DelItemHandler(core.Handler):
         presc_item_id = params.get('presc_item_id')
         flag = tools.prescription_del_item(presc_id, presc_item_id)
         if flag:
-            return success(data=params)
+            return success({'id': presc_id})
         else:
             return error(UAURET.DATAERR)
 
@@ -237,6 +243,7 @@ class UpdateItemHandler(core.Handler):
         Field('id', T_INT, False),
         Field('presc_item_id', T_INT, False),
         Field('count', T_INT, False),
+        Field('token', T_STR, False),
         # Field('train_type', T_INT, False, match=r'^([0-2]){1}$'),
         # Field('param', T_STR, False), # validator 解析带逗号的字符串出错
     ]
@@ -269,6 +276,7 @@ class UpdateItemHandler(core.Handler):
             item_id = presc_item_info.get('item_id')
             params['item_id'] = item_id
             # params['param'] = param
+            params.pop('token')
             return success(data=params)
         return error(UAURET.DATAERR)
 

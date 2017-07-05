@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
+import uuid
 import json
 import inspect
 import traceback
@@ -29,6 +30,7 @@ class CreateHandler(core.Handler):
         Field('item_type', T_INT, False, match=r'^([1-2]){1}$'),
         Field('lng', T_FLOAT, False),
         Field('lat', T_FLOAT, False),
+        Field('token', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -40,6 +42,7 @@ class CreateHandler(core.Handler):
         if not self.device.sauth:
             return error(UAURET.SESSIONERR)
         params = self.validator.data
+        params.pop("token")
         userid = params.get('userid')
         device_id = params.get('device_id')
         item_type = params.get('item_type')
@@ -69,7 +72,7 @@ class CreateHandler(core.Handler):
             return error(UAURET.DATAERR)
         params['id'] = train_id
         token = self.device.se.sk
-        push_data = {"msgid": train_id, "data": {}}
+        push_data = {"msgid": str(uuid.uuid4()), "data": {}}
         if item_type == define.UYU_ITEM_TYPE_TRAIN:
             push_data["type"] = "train"
             push_data["data"]["id"] = train_id
@@ -97,6 +100,7 @@ class InfoHandler(core.Handler):
 
     _get_handler_fields = [
         Field('id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):
@@ -108,6 +112,7 @@ class InfoHandler(core.Handler):
         if not self.device.sauth:
             return error(UAURET.SESSIONERR)
         params = self.validator.data
+        params.pop("token")
         train_id = params.get('id')
         ret = tools.train_info(train_id)
         if ret:
@@ -130,7 +135,8 @@ class ListHandler(core.Handler):
     _get_handler_fields = [
         Field('size', T_INT, False),
         Field('page', T_INT, False),
-        Field('userid', T_INT, True)
+        Field('userid', T_INT, True),
+        Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):
@@ -143,6 +149,7 @@ class ListHandler(core.Handler):
             return error(UAURET.SESSIONERR)
         result = {}
         params = self.validator.data
+        params.pop("token")
         size = params.get('size')
         page = params.get('page')
         userid = params.get('userid')
@@ -173,6 +180,7 @@ class CompleteHandler(core.Handler):
         Field('name', T_STR, False),
         Field('item_id', T_INT, False),
         Field('times', T_INT, True),
+        Field('token', T_STR, False),
         # Field('result', T_STR, False),
     ]
 
@@ -185,6 +193,7 @@ class CompleteHandler(core.Handler):
         if not self.device.sauth:
             return error(UAURET.SESSIONERR)
         params = self.validator.data
+        params.pop("token")
         train_id = params.get('id')
         step = params.get('step')
         name = params.get('name')
@@ -233,6 +242,7 @@ class CloseHandler(core.Handler):
 
     _post_handler_fields = [
         Field('id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _post_handler_errfunc(self, msg):
@@ -244,6 +254,7 @@ class CloseHandler(core.Handler):
         if not self.device.sauth:
             return error(UAURET.SESSIONERR)
         params = self.validator.data
+        params.pop("token")
         train_id = params.get('id')
         flag = tools.train_close(train_id)
         if not flag:
@@ -265,7 +276,8 @@ class CloseHandler(core.Handler):
 class QrcodeHandler(core.Handler):
 
     _get_handler_fields = [
-        Field('device_id', T_INT, False)
+        Field('device_id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):

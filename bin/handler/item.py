@@ -21,6 +21,7 @@ class CreateHandler(core.Handler):
     _post_handler_fields = [
         Field('name', T_STR, False),
         Field('item_type', T_INT, False, match=r'^([0-1]){1}$'),
+        Field('token', T_STR, False),
         # Field('content', T_STR, False),
     ]
 
@@ -65,6 +66,7 @@ class UpdateHandler(core.Handler):
         Field('id', T_INT, False),
         Field('name', T_STR, False),
         Field('item_type', T_INT, False, match=r'^([0-1]){1}$'),
+        Field('token', T_STR, False),
         # Field('content', T_STR, False),
     ]
 
@@ -105,7 +107,8 @@ class UpdateHandler(core.Handler):
 class InfoHandler(core.Handler):
 
     _get_handler_fields = [
-        Field('id', T_INT, False)
+        Field('id', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):
@@ -138,7 +141,8 @@ class ListHandler(core.Handler):
 
     _get_handler_fields = [
         Field('size', T_INT, False),
-        Field('page', T_INT, False)
+        Field('page', T_INT, False),
+        Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):

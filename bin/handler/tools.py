@@ -168,8 +168,12 @@ def get_current_func():
 
 
 def verify_item_type(item_type):
+    log.debug('func=%s|item_type=%s|type=%s', inspect.stack()[0][3], item_type, type(item_type))
+    flag = True
     if int(item_type) not in (define.UYU_ITEM_CHECK, define.UYU_ITEM_TRAIN):
-        return False
+        flag = False
+    log.debug('func=%s|ret=%s', inspect.stack()[0][3], flag)
+    return flag
 
 
 def verify_trade_type(trade_type):
@@ -588,7 +592,7 @@ def train_complete(train_id, step, result, name, presc_id, item_id, times=''):
                 'train_id': train_id,
                 'presc_id': presc_id,
                 'item_id': item_id,
-                'name': name,
+                'item_name': name,
                 'result': json.dumps(result),
                 'ctime': now,
                 'utime': now

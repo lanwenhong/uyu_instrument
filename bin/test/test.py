@@ -18,13 +18,13 @@ class TestUyuInstrument(unittest.TestCase):
         self.timeout = 2000
         self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
         self.client = HttpClient(self.server, client_class = RequestsClient)
-        self.headers = {'cookie': 'token=d5872ece-433f-451c-b4cf-fca97f759489'}
+        self.headers = {'cookie': 'token=45325192-7f20-4db4-958a-4a15443f2986'}
 
     @unittest.skip("skipping")
     def test_device_login(self):
         self.url = '/v1/device/auth'
         self.send = {
-            "device_addr": "11:22:33:44:44",
+            "device_addr": "bt_v2",
             "password": 123456
         }
         ret = self.client.get(self.url, self.send)
@@ -50,9 +50,10 @@ class TestUyuInstrument(unittest.TestCase):
         }
         param_str = json.dumps(param)
         self.send = {
-            "name": '项目13',
+            "name": '项目DC_1',
             "item_type": 2,
-            "content": param_str
+            "content": param_str,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -62,11 +63,23 @@ class TestUyuInstrument(unittest.TestCase):
     @unittest.skip("skipping")
     def test_item_update(self):
         self.url = '/v1/item/update'
+        param = {
+            "trade_type": 0,
+            "eye_type": 1,
+            "left_eye_level": "+1.50/-1.50",
+            "right_eye_level": "+1.50/-1.50",
+            "font_size": 15,
+            "line_type": 1,
+            "line_count": 2,
+            "pic_count": 4,
+        }
+        param_str = json.dumps(param)
         self.send = {
-            "name": '项目7',
-            "item_type": 2,
-            "content": "test.20170626_3",
-            "id": 7,
+            "name": '项目DC_2',
+            "item_type": 1,
+            "content": param_str,
+            "id": 15,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -77,7 +90,8 @@ class TestUyuInstrument(unittest.TestCase):
     def test_item_info(self):
         self.url = '/v1/item/info'
         self.send = {
-            "id": 7,
+            "id": 15,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -91,6 +105,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.send = {
             "size": 5,
             "page": 1,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -102,8 +117,9 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_create(self):
         self.url = '/v1/prescription/create'
         self.send = {
-            "userid": 1267,
+            "userid": 51641,
             "optometrist_id": 1199,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -114,9 +130,10 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_update(self):
         self.url = '/v1/prescription/update'
         self.send = {
-            "id": 5,
+            "id": 8,
             "userid": 1267,
             "optometrist_id": 1207,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -128,7 +145,8 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_info(self):
         self.url = '/v1/prescription/info'
         self.send = {
-            "id": 1,
+            "id": 8,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -140,9 +158,10 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_add_item(self):
         self.url = '/v1/prescription/add_item'
         self.send = {
-            "id": 1,
-            "item_id": 12,
-            "count": 2,
+            "id": 8,
+            "item_id": 15,
+            "count": 5,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -154,8 +173,9 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_del_item(self):
         self.url = '/v1/prescription/del_item'
         self.send = {
-            "id": 5,
-            "presc_item_id": 3,
+            "id": 8,
+            "presc_item_id": 15,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -168,9 +188,10 @@ class TestUyuInstrument(unittest.TestCase):
     def test_prescription_update_item(self):
         self.url = '/v1/prescription/update_item'
         self.send = {
-            "id": 5,
-            "presc_item_id": 3,
+            "id": 8,
+            "presc_item_id": 15,
             "count": 8,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -179,15 +200,16 @@ class TestUyuInstrument(unittest.TestCase):
 
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_create(self):
         self.url = '/v1/train/create'
         self.send = {
-            "userid": 1276,
-            "device_id": 111,
+            "userid": 51641,
+            "device_id": 112,
             "item_type": 2,
             "lng": 14.123,
-            "lat": 15.234
+            "lat": 15.234,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -199,7 +221,8 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_info(self):
         self.url = '/v1/train/info'
         self.send = {
-            "id": 3,
+            "id": 11,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -213,7 +236,8 @@ class TestUyuInstrument(unittest.TestCase):
         self.send = {
             "size": 10,
             "page": 1,
-            "userid": 1276,
+            "userid": 51641,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -375,8 +399,9 @@ class TestUyuInstrument(unittest.TestCase):
             "times": 10,
             "result": json.dumps(result),
             "name": '立体视检查',
-            "item_id": 11,
-            "id": 3,
+            "item_id": 15,
+            "id": 10,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -388,7 +413,8 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_close(self):
         self.url = '/v1/train/close'
         self.send = {
-            "id": 1,
+            "id": 10,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -401,6 +427,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.url = '/v1/train/qrcode'
         self.send = {
             "device_id": 1,
+            "token": "45325192-7f20-4db4-958a-4a15443f2986"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
