@@ -632,6 +632,7 @@ def gen_qrcode_base64(qrcode_txt):
 
 def call_api_change(userid, store_userid, training_times, device_id, train_id):
     flag = True
+    record_id = None
     data = {
         'userid': userid,
         'store_userid': store_userid,
@@ -651,8 +652,10 @@ def call_api_change(userid, store_userid, training_times, device_id, train_id):
     respcd = result.get('respcd')
     if respcd != '0000':
         flag = False
-    log.debug('func=%s|ret=%s', inspect.stack()[0][3], flag)
-    return flag
+    else:
+        record_id = result['data']['record_id']
+    log.debug('func=%s|ret|flag=%s|record_id=%s', inspect.stack()[0][3], flag, record_id)
+    return flag, record_id
 
 
 def eye_level_measurement(data):
@@ -688,3 +691,14 @@ def push_msg(token, data):
     except Exception as e:
         log.warn(e)
         log.warn(traceback.format_exc())
+
+
+def update_train(train_id, record_id):
+    log.debug('func=%s|in|train_id=%s|record_id=%s', inspect.stack()[0][3], train_id, record_id)
+    with get_connection_exception('uyu_core') as conn:
+        now = datetime.datetime.now()
+        values = {'record_id': record_id, 'utime': now}
+        where = {'id': train_id}
+        ret = conn.update(table='train', values=values, where=where)
+        log.debug('func=%s|update ret=%s', inspect.stack()[0][3], ret)
+        return ret

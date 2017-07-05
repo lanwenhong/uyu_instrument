@@ -76,9 +76,12 @@ class CreateHandler(core.Handler):
         if item_type == define.UYU_ITEM_TYPE_TRAIN:
             push_data["type"] = "train"
             push_data["data"]["id"] = train_id
-            flag = tools.call_api_change(userid, store_userid, 1, device_id, train_id)
+            flag, record_id = tools.call_api_change(userid, store_userid, 1, device_id, train_id)
             if not flag:
                 return error(UAURET.SUBTIMESERR)
+            ret = tools.update_train(train_id, record_id)
+            if ret != 1:
+                return error(UAURET.UPDATETRAININFOERR)
         else:
             push_data["type"] = "inspect"
             push_data["data"]["id"] = train_id
