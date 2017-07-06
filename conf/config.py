@@ -72,3 +72,6 @@ PUSH_SERVER = {
     'host': '127.0.0.1',
     'timeout': 2000
 }
+#二维码图片存放位置
+QRCODE_STORE_PATH = '/home/dengcheng/uyu_instrument/tmp/'
+QRCODE_LINK_BASE = 'http://121.40.177.111:10040/static/'

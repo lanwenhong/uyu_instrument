@@ -14,7 +14,7 @@ from uyubase.uyu import define
 from uyubase.base.uyu_device import UDevice
 from uyubase.uyu.define import UYU_OP_ERR, UYU_OP_OK
 import logging, datetime, time
-
+import config
 from runtime import g_rt
 from config import cookie_conf
 import tools
@@ -184,6 +184,7 @@ class CompleteHandler(core.Handler):
         Field('item_id', T_INT, False),
         Field('times', T_INT, True),
         Field('token', T_STR, False),
+        Field('isend', T_INT, False),
         # Field('result', T_STR, False),
     ]
 
@@ -202,6 +203,7 @@ class CompleteHandler(core.Handler):
         name = params.get('name')
         times = params.get('times')
         item_id = params.get('item_id')
+        isend = params.get('isend')
 
         if not self.req.input().has_key('result'):
             return error(UAURET.PARAMERR)
@@ -224,7 +226,7 @@ class CompleteHandler(core.Handler):
         if not flag:
             return error(UAURET.DATAERR)
 
-        flag = tools.train_complete(train_id, step, result, name, presc_id, item_id, times)
+        flag = tools.train_complete(train_id, step, result, name, presc_id, item_id, isend, times)
         if flag:
             params.pop('times')
             return success(data=params)
@@ -279,7 +281,6 @@ class CloseHandler(core.Handler):
 class QrcodeHandler(core.Handler):
 
     _get_handler_fields = [
-        Field('device_id', T_INT, False),
         Field('token', T_STR, False),
     ]
 
@@ -292,10 +293,13 @@ class QrcodeHandler(core.Handler):
         if not self.device.sauth:
             return error(UAURET.SESSIONERR)
         params = self.validator.data
-        device_id = params.get('device_id')
-        qrcode_txt = 'http://baidu.com'
-        ret = tools.gen_qrcode_base64(qrcode_txt)
-        data = {'device_id': device_id, 'qrcode': qrcode_txt, 'qrcode_pic': ret}
+        device_id = self.device.data['id']
+        qrcode_txt = 'test'
+        flag, filename = tools.gen_qrcode_file(qrcode_txt)
+        if not flag:
+            return error(UAURET.GENPICFILEERR)
+        qrcode_link = config.QRCODE_LINK_BASE + filename
+        data = {'device_id': device_id, 'qrcode': qrcode_txt, 'qrcode_link': qrcode_link}
         return success(data=data)
 
     def GET(self):

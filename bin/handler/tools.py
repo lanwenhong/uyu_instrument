@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
 import json
 import qrcode
@@ -558,13 +559,14 @@ def train_total(userid=''):
         return int(ret[0]['total']) if ret[0]['total'] else 0
 
 
-def train_complete(train_id, step, result, name, presc_id, item_id, times=''):
+def train_complete(train_id, step, result, name, presc_id, item_id, isend, times=''):
     with get_connection_exception('uyu_core') as conn:
         now = datetime.datetime.now()
         where = {'id': train_id}
         values = {
             'step': step,
-            'state': define.UYU_TRAIN_STATE_END,
+            # 'state': define.UYU_TRAIN_STATE_END,
+            'state': int(isend),
             'utime': now
         }
         if times:
@@ -628,6 +630,22 @@ def gen_qrcode_base64(qrcode_txt):
     f.close()
     ret = 'data:image/png;base64,' + d
     return ret
+
+
+def gen_qrcode_file(qrcode_txt):
+    log.debug('func=%s|qrcode_txt=%s', inspect.stack()[0][3], qrcode_txt)
+    flag = True
+    now = datetime.datetime.now()
+    filename = now.strftime('%Y%m%d%H%M%S%f') + '.png'
+    full_name = config.QRCODE_STORE_PATH + filename 
+    qr = qrcode.QRCode()
+    qr.add_data(qrcode_txt)
+    img = qr.make_image()
+    img.save(full_name)
+    if not os.path.exists(full_name):
+        flag = False
+    log.debug('func=%s|ret|flag=%s|filename=%s', inspect.stack()[0][3], flag, filename)
+    return flag, filename
 
 
 def call_api_change(userid, store_userid, training_times, device_id, train_id):

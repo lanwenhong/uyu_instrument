@@ -40,7 +40,7 @@ class LoginHandler(core.Handler):
 
         log.debug("get device data: %s", d_op.data)
         log.debug("device_addr: %s login success", d_op.data['device_addr'])
-        return success({"device_addr": d_op.data['device_addr'], "token": self.session.sk})
+        return success({"device_addr": d_op.data['device_addr'], "token": self.session.sk, "id":d_op.data['device_id']})
 
 
     def GET(self, *args):

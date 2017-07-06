@@ -18,7 +18,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.timeout = 2000
         self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
         self.client = HttpClient(self.server, client_class = RequestsClient)
-        self.headers = {'cookie': 'token=45325192-7f20-4db4-958a-4a15443f2986'}
+        self.headers = {'cookie': 'token=72197bc3-474f-46e3-8019-64b5df4b9994'}
 
     @unittest.skip("skipping")
     def test_device_login(self):
@@ -200,7 +200,7 @@ class TestUyuInstrument(unittest.TestCase):
 
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_create(self):
         self.url = '/v1/train/create'
         self.send = {
@@ -245,7 +245,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         # 视力检查
@@ -401,7 +401,8 @@ class TestUyuInstrument(unittest.TestCase):
             "name": '立体视检查',
             "item_id": 15,
             "id": 10,
-            "token": "45325192-7f20-4db4-958a-4a15443f2986"
+            "isend": 0,
+            "token": "72197bc3-474f-46e3-8019-64b5df4b9994"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -426,8 +427,7 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_qrcode(self):
         self.url = '/v1/train/qrcode'
         self.send = {
-            "device_id": 1,
-            "token": "45325192-7f20-4db4-958a-4a15443f2986"
+            "token": "72197bc3-474f-46e3-8019-64b5df4b9994"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
