@@ -100,7 +100,7 @@ CHECK_ITEM_NAME = {
     '调节灵敏度': {
         'keys': {
             'seq': {
-                'must': ['eye', 'cycle'],
+                'must': ['eye', 'cycle', 'press_time'],
                 'option': []
             }
         }
@@ -108,7 +108,7 @@ CHECK_ITEM_NAME = {
     '聚散灵敏度': {
         'keys': {
             'seq': {
-                'must': ['cycle'],
+                'must': ['cycle', 'press_time'],
                 'option': []
             }
         }
@@ -135,7 +135,6 @@ def check_result(name, result):
     flag = True
     check = CHECK_ITEM_NAME.get(name)['keys']
     if 'glasses' in check.keys():
-        # if result['glasses'] not in ('true', 'false'):
         if result['glasses'] not in (True, False):
             log.warn('func=%s|key=%s|vlaue=%s|invalid', 'check_result', 'glasses', result['glasses'])
             return False
@@ -150,6 +149,20 @@ def check_result(name, result):
                 log.warn('func=%s|key=%s|not exist', 'check_result', key)
                 flag = False
                 return flag
+            if key == 'press_time':
+                # 检查类型是list
+                value = item[key]
+                if not isinstance(value, list):
+                    log.warn('func=%s|key=%s|value type error', 'check_result', key)
+                    flag = False
+                    return flag
+                # 是一个list检查每一项的类型
+                for v in value:
+                    if not isinstance(v, int):
+                        log.warn('func=%s|key=%s|v error', 'check_result', key)
+                        flag = False
+                        return flag
+
     f_n = CHECK_ITEM_NAME.get(name).get('func', None)
     if f_n:
         func_map = globals()

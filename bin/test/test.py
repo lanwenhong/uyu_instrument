@@ -18,7 +18,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.timeout = 2000
         self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
         self.client = HttpClient(self.server, client_class = RequestsClient)
-        self.headers = {'cookie': 'token=72197bc3-474f-46e3-8019-64b5df4b9994'}
+        self.headers = {'cookie': 'token=dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3'}
 
     @unittest.skip("skipping")
     def test_device_login(self):
@@ -159,9 +159,9 @@ class TestUyuInstrument(unittest.TestCase):
         self.url = '/v1/prescription/add_item'
         self.send = {
             "id": 8,
-            "item_id": 15,
+            "item_id": 23,
             "count": 5,
-            "token": "45325192-7f20-4db4-958a-4a15443f2986"
+            "token": "dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -361,22 +361,25 @@ class TestUyuInstrument(unittest.TestCase):
         #     "seq": [
         #         {
         #             "eye": "l",
-        #             "cycle": 10
+        #             "cycle": 10,
+        #             "press_time":[1,2,3,4]
         #         },
         #         {
         #             "eye": "r",
-        #             "cycle": 15
+        #             "cycle": 15,
+        #             "press_time":[1,2,3,4]
         #         },
         #     ]
         # }
         # 聚散灵敏度
-        # result = {
-        #     "seq": [
-        #         {
-        #             "cycle": 10
-        #         }
-        #     ]
-        # }
+        result = {
+            "seq": [
+                {
+                    "cycle": 10,
+                    "press_time":[1,2,3,4, 'a']
+                }
+            ]
+        }
         # 色觉检查
         # result = {
         #     "seq": [
@@ -387,22 +390,21 @@ class TestUyuInstrument(unittest.TestCase):
         #     ]
         # }
         # 立体视检查
-        result = {
-            "seq": [
-                {
-                    "pic_name": "a.jpg"
-                }
-            ]
-        }
+        # result = {
+        #     "seq": [
+        #         {
+        #             "pic_name": "a.jpg"
+        #         }
+        #     ]
+        # }
         self.send = {
             "step": 2,
             "times": 10,
             "result": json.dumps(result),
-            "name": '立体视检查',
-            "item_id": 15,
+            "name": '聚散灵敏度',
             "id": 10,
             "isend": 0,
-            "token": "72197bc3-474f-46e3-8019-64b5df4b9994"
+            "token": "dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
