@@ -135,6 +135,7 @@ def check_result(name, result):
     flag = True
     check = CHECK_ITEM_NAME.get(name)['keys']
     if 'glasses' in check.keys():
+        # if result['glasses'] not in ('true', 'false'):
         if result['glasses'] not in (True, False):
             log.warn('func=%s|key=%s|vlaue=%s|invalid', 'check_result', 'glasses', result['glasses'])
             return False
@@ -234,6 +235,15 @@ def verify_item(item_id):
         return ret
 
 
+def check_item_by_name(name):
+    log.debug('func=%s|name=%s', inspect.stack()[0][3], name)
+    with get_connection_exception('uyu_core') as conn:
+        where = {'name': name}
+        ret = conn.select_one(table='item', fields='*', where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
+        return ret
+
+
 def verify_param(param):
     flag = True
     print 'verify_param input:', param
@@ -326,9 +336,11 @@ def get_presc_item_content(presc_id):
 
 
 def get_train_result(train_id):
+    log.debug('func=%s|train_id=%s', inspect.stack()[0][3], train_id)
     with get_connection_exception('uyu_core') as conn:
         where = {'train_id': train_id}
         ret = conn.select(table='result', fields=['result'], where=where)
+        log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         return ret
 
 
@@ -516,6 +528,11 @@ def train_info(train_id):
             'ctime', 'utime'
         ]
         ret = conn.select_one(table='train', fields=keep_fields, where=where)
+        if not ret:
+            return None
+        if not result:
+            ret['result'] = []
+            return ret
         ret['result'] = [item['result'] for item in result]
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         if ret:

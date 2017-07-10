@@ -63,10 +63,13 @@ class CreateHandler(core.Handler):
             return error(UAURET.DEVICEUNBINDERR)
         ret = tools.get_store_info(store_id)
         store_userid = ret['userid']
-        ret = tools.get_user_presc(userid)
-        if not ret:
-            return error(UAURET.USERNOPRESCERR)
-        presc_id = ret['id']
+        if item_type == define.UYU_ITEM_CHECK:
+            presc_id = 0
+        else:
+            ret = tools.get_user_presc(userid)
+            if not ret:
+                return error(UAURET.USERNOPRESCERR)
+            presc_id = ret['id']
         train_id = tools.train_create(params, channel_id, store_id, presc_id)
         if train_id is None:
             return error(UAURET.DATAERR)
@@ -181,7 +184,7 @@ class CompleteHandler(core.Handler):
         Field('id', T_INT, False),
         Field('step', T_INT, False),
         Field('name', T_STR, False),
-        Field('item_id', T_INT, False),
+        # Field('item_id', T_INT, False),
         Field('times', T_INT, True),
         Field('token', T_STR, False),
         Field('isend', T_INT, False),
@@ -202,7 +205,7 @@ class CompleteHandler(core.Handler):
         step = params.get('step')
         name = params.get('name')
         times = params.get('times')
-        item_id = params.get('item_id')
+        # item_id = params.get('item_id')
         isend = params.get('isend')
 
         if not self.req.input().has_key('result'):
@@ -218,6 +221,12 @@ class CompleteHandler(core.Handler):
         presc_id = ret.get('presc_id')
         items = [item['item_id'] for item in tools.get_all_presc_item(presc_id)]
         log.debug('func=%s|train_id=%s|items=%s', inspect.stack()[0][3], train_id, items)
+
+        ret = tools.check_item_by_name(name)
+        if not ret:
+            return error(UAURET.DATAERR)
+
+        item_id = ret.get('id')
         if int(item_id) not in items:
             log.debug('func=%s|item_id=%s|invalid', inspect.stack()[0][3], item_id)
             return error(UAURET.DATAERR)
