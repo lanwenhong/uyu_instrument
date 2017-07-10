@@ -43,7 +43,7 @@ CHECK_ITEM_NAME = {
                 'must': ['optic', 'font_size', 'vision', 'eye'],
                 'option': []
             },
-            'glasses': 'true'
+            'glasses': True
         }
     },
     '红绿检查': {
@@ -52,7 +52,7 @@ CHECK_ITEM_NAME = {
                 'must': ['eye', 'color'],
                 'option': []
             },
-            'glasses': 'true'
+            'glasses': True
         }
     },
     'worth4点': {
@@ -135,7 +135,7 @@ def check_result(name, result):
     flag = True
     check = CHECK_ITEM_NAME.get(name)['keys']
     if 'glasses' in check.keys():
-        if result['glasses'] not in ('true', 'false'):
+        if result['glasses'] not in (True, False):
             log.warn('func=%s|key=%s|vlaue=%s|invalid', 'check_result', 'glasses', result['glasses'])
             return False
     seq = result['seq']
