@@ -9,6 +9,7 @@ import inspect
 import logging
 import datetime
 import config
+from PIL import Image
 from zbase.base.dbpool import get_connection_exception
 from zbase.base.http_client import RequestsClient
 from zbase.server.client import HttpClient
@@ -671,7 +672,8 @@ def gen_qrcode_file(qrcode_txt):
     qr = qrcode.QRCode()
     qr.add_data(qrcode_txt)
     img = qr.make_image()
-    img.save(full_name)
+    out = img.resize(config.IMAGE_SIZE, Image.ANTIALIAS)
+    out.save(full_name)
     if not os.path.exists(full_name):
         flag = False
     log.debug('func=%s|ret|flag=%s|filename=%s', inspect.stack()[0][3], flag, filename)

@@ -56,9 +56,9 @@ template = os.path.join(HOME, 'template')
 HOST = '0.0.0.0'
 # 服务端口
 PORT = 8088
-#redis
+# redis
 redis_url = 'redis://127.0.0.1:4600/0'
-#cookie 配置
+# cookie 配置
 cookie_conf = { 'expires':60*60*24*3, 'max_age':60*60*24*3, 'domain':'121.40.177.111', 'path':'/instrument'}
 API_SERVER = {
     'url': '/internal/v1/api/consumer_change',
@@ -72,6 +72,8 @@ PUSH_SERVER = {
     'host': '127.0.0.1',
     'timeout': 2000
 }
-#二维码图片存放位置
+# 二维码图片存放位置
 QRCODE_STORE_PATH = '/home/dengcheng/uyu_instrument/tmp/'
 QRCODE_LINK_BASE = 'http://121.40.177.111:10040/static/'
+# 二维码图片尺寸大小
+IMAGE_SIZE = (1600, 1600)

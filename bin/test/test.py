@@ -245,7 +245,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         # 视力检查
@@ -425,11 +425,11 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_qrcode(self):
         self.url = '/v1/train/qrcode'
         self.send = {
-            "token": "72197bc3-474f-46e3-8019-64b5df4b9994"
+            "token": "dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
