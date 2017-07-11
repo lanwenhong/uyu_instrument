@@ -76,4 +76,6 @@ PUSH_SERVER = {
 QRCODE_STORE_PATH = '/home/dengcheng/uyu_instrument/tmp/'
 QRCODE_LINK_BASE = 'http://121.40.177.111:10040/static/'
 # 二维码图片尺寸大小
-IMAGE_SIZE = (1600, 1600)
+IMAGE_SIZE = (638, 638)
+# 图片裁剪大小
+IMAGE_BOX = (90, 90, 550, 550)

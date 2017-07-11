@@ -673,7 +673,8 @@ def gen_qrcode_file(qrcode_txt):
     qr.add_data(qrcode_txt)
     img = qr.make_image()
     out = img.resize(config.IMAGE_SIZE, Image.ANTIALIAS)
-    out.save(full_name)
+    region = out.crop(config.IMAGE_BOX)
+    region.save(full_name)
     if not os.path.exists(full_name):
         flag = False
     log.debug('func=%s|ret|flag=%s|filename=%s', inspect.stack()[0][3], flag, filename)
