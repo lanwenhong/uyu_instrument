@@ -139,6 +139,12 @@ def check_result(name, result):
         if result['glasses'] not in (True, False):
             log.warn('func=%s|key=%s|vlaue=%s|invalid', 'check_result', 'glasses', result['glasses'])
             return False
+    if not isinstance(result, dict):
+        log.warn('func=%s|result=%s|type eror', 'check_result', result)
+        return False
+    if 'seq' not in result.keys():
+        log.warn('func=%s|seq not exists', 'check_result')
+        return False
     seq = result['seq']
     if not isinstance(seq, list):
         log.warn('func=%s|key=%s|invalid', 'check_result', 'seq')

@@ -245,7 +245,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         # 视力检查
@@ -372,6 +372,15 @@ class TestUyuInstrument(unittest.TestCase):
         #     ]
         # }
         # 聚散灵敏度
+        # result = {
+        #     "seq": [
+        #         {
+        #             "cycle": 10,
+        #             "press_time":[1,2,3,4, 'a']
+        #         }
+        #     ]
+        # }
+        # 垃圾数据
         result = {
             "seq": [
                 {
@@ -425,7 +434,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_qrcode(self):
         self.url = '/v1/train/qrcode'
         self.send = {
