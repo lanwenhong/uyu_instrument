@@ -165,7 +165,7 @@ def check_result(name, result):
                     return flag
                 # 是一个list检查每一项的类型
                 for v in value:
-                    if not isinstance(v, int):
+                    if not isinstance(int(v), int):
                         log.warn('func=%s|key=%s|v error', 'check_result', key)
                         flag = False
                         return flag
