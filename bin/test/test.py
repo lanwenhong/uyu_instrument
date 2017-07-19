@@ -20,12 +20,12 @@ class TestUyuInstrument(unittest.TestCase):
         self.client = HttpClient(self.server, client_class = RequestsClient)
         self.headers = {'cookie': 'token=dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3'}
 
-    @unittest.skip("skipping")
+    #@unittest.skip("skipping")
     def test_device_login(self):
         self.url = '/v1/device/auth'
         self.send = {
             "device_addr": "bt_v2",
-            "password": 123456
+            "password": 'e10adc3949ba59abbe56e057f20f883e'
         }
         ret = self.client.get(self.url, self.send)
         log.info(ret)
@@ -245,7 +245,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         # 视力检查
