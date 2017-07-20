@@ -550,6 +550,11 @@ def train_info(train_id):
         ret = conn.select_one(table='train', fields=keep_fields, where=where)
         if not ret:
             return None
+        else:
+            if ret['lng']:
+                ret['lng'] = float(ret['lng'])
+            if ret['lat']:
+                ret['lat'] = float(ret['lat'])
         if not result:
             ret['result'] = []
             return ret
@@ -559,6 +564,7 @@ def train_info(train_id):
             ret['ctime'] = datetime.datetime.strftime(ret['ctime'], '%Y-%m=%d %H:%M:%S')
             if ret['utime']:
                 ret['utime'] = datetime.datetime.strftime(ret['utime'], '%Y-%m=%d %H:%M:%S')
+
 
         return ret
 
@@ -581,6 +587,10 @@ def train_list(offset, limit, userid=''):
                 item['ctime'] = datetime.datetime.strftime(item['ctime'], '%Y-%m=%d %H:%M:%S')
                 if item['utime']:
                     item['utime'] = datetime.datetime.strftime(item['utime'], '%Y-%m=%d %H:%M:%S')
+                if item['lng']:
+                    item['lng'] = float(item['lng'])
+                if item['lat']:
+                    item['lat'] = float(item['lat'])
         return ret
 
 

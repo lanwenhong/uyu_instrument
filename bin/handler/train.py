@@ -106,19 +106,19 @@ class InfoHandler(core.Handler):
 
     _get_handler_fields = [
         Field('id', T_INT, False),
-        Field('token', T_STR, False),
+        # Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
-    @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
+    # @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
     @with_validator_self
     def _get_handler(self):
-        if not self.device.sauth:
-            return error(UAURET.SESSIONERR)
+        # if not self.device.sauth:
+        #     return error(UAURET.SESSIONERR)
         params = self.validator.data
-        params.pop("token")
+        # params.pop("token")
         train_id = params.get('id')
         ret = tools.train_info(train_id)
         if ret:
@@ -142,20 +142,20 @@ class ListHandler(core.Handler):
         Field('size', T_INT, False),
         Field('page', T_INT, False),
         Field('userid', T_INT, True),
-        Field('token', T_STR, False),
+        # Field('token', T_STR, False),
     ]
 
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
-    @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
+    # @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
     @with_validator_self
     def _get_handler(self):
-        if not self.device.sauth:
-            return error(UAURET.SESSIONERR)
+        # if not self.device.sauth:
+        #     return error(UAURET.SESSIONERR)
         result = {}
         params = self.validator.data
-        params.pop("token")
+        # params.pop("token")
         size = params.get('size')
         page = params.get('page')
         userid = params.get('userid')
