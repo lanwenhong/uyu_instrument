@@ -84,7 +84,7 @@ CHECK_ITEM_NAME = {
     '融像检查': {
         'keys': {
             'seq': {
-                'must': ['optic', 'pic_dis_blur', 'pic_dis_burst', 'pic_dis_recover'],
+                'must': ['optic', 'pic_dis_blur', 'pic_dis_burst', 'pic_dis_recover', 'base'],
                 'option': []
             }
         }
@@ -359,7 +359,7 @@ def get_train_result(train_id):
     log.debug('func=%s|train_id=%s', inspect.stack()[0][3], train_id)
     with get_connection_exception('uyu_core') as conn:
         where = {'train_id': train_id}
-        ret = conn.select(table='result', fields=['result'], where=where)
+        ret = conn.select(table='result', fields=['result', 'item_name'], where=where)
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         return ret
 
@@ -558,7 +558,8 @@ def train_info(train_id):
         if not result:
             ret['result'] = []
             return ret
-        ret['result'] = [item['result'] for item in result]
+        # ret['result'] = [item['result'] for item in result]
+        ret['result'] = [{'name': item['item_name'], 'result': item['result']} for item in result]
         log.debug('func=%s|db ret=%s', inspect.stack()[0][3], ret)
         if ret:
             ret['ctime'] = datetime.datetime.strftime(ret['ctime'], '%Y-%m=%d %H:%M:%S')
@@ -581,7 +582,8 @@ def train_list(offset, limit, userid=''):
             for item in ret:
                 result = get_train_result(item['id'])
                 if result:
-                    item['result'] = [r['result'] for r in result]
+                    # item['result'] = [r['result'] for r in result]
+                    item['result'] = [{'name': r['item_name'], 'result': r['result']} for r in result]
                 else:
                     item['result'] = []
                 item['ctime'] = datetime.datetime.strftime(item['ctime'], '%Y-%m=%d %H:%M:%S')

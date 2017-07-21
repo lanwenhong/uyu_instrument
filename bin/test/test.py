@@ -18,9 +18,9 @@ class TestUyuInstrument(unittest.TestCase):
         self.timeout = 2000
         self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
         self.client = HttpClient(self.server, client_class = RequestsClient)
-        self.headers = {'cookie': 'token=dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3'}
+        self.headers = {'cookie': 'token=93585612-0b2b-4d76-96cc-a8ca3adf9df6'}
 
-    #@unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_device_login(self):
         self.url = '/v1/device/auth'
         self.send = {
@@ -159,9 +159,9 @@ class TestUyuInstrument(unittest.TestCase):
         self.url = '/v1/prescription/add_item'
         self.send = {
             "id": 8,
-            "item_id": 23,
+            "item_id": 19,
             "count": 5,
-            "token": "dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3"
+            "token": "93585612-0b2b-4d76-96cc-a8ca3adf9df6"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -221,8 +221,8 @@ class TestUyuInstrument(unittest.TestCase):
     def test_train_info(self):
         self.url = '/v1/train/info'
         self.send = {
-            "id": 11,
-            "token": "45325192-7f20-4db4-958a-4a15443f2986"
+            "id": 10,
+            "token": "93585612-0b2b-4d76-96cc-a8ca3adf9df6"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -230,14 +230,14 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_list(self):
         self.url = '/v1/train/list'
         self.send = {
             "size": 10,
             "page": 1,
             "userid": 51641,
-            "token": "45325192-7f20-4db4-958a-4a15443f2986"
+            "token": "93585612-0b2b-4d76-96cc-a8ca3adf9df6"
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -312,22 +312,24 @@ class TestUyuInstrument(unittest.TestCase):
         #     ] 
         # }
         # 融像检查
-        # result = {
-        #     "seq": [
-        #         {
-        #             "pic_dis_burst": 2,
-        #             "pic_dis_recover": 3,
-        #             "optic": 250,
-        #             "pic_dis_blur": 1
-        #         },
-        #         {
-        #             "pic_dis_burst": 2,
-        #             "pic_dis_recover": 3,
-        #             "optic": 250,
-        #             "pic_dis_blur": 1
-        #         }
-        #     ]
-        # }
+        result = {
+            "seq": [
+                {
+                    "pic_dis_burst": 2,
+                    "pic_dis_recover": 3,
+                    "optic": 250,
+                    "pic_dis_blur": 1,
+                    "base": 'BO'
+                },
+                {
+                    "pic_dis_burst": 2,
+                    "pic_dis_recover": 3,
+                    "optic": 250,
+                    "pic_dis_blur": 1,
+                    "base": 'BI'
+                }
+            ]
+        }
         # 眼位测量2
         # result = {
         #     "seq": [
@@ -381,14 +383,14 @@ class TestUyuInstrument(unittest.TestCase):
         #     ]
         # }
         # 垃圾数据
-        result = {
-            "seq": [
-                {
-                    "cycle": 10,
-                    "press_time":[1,2,3,4, 'a']
-                }
-            ]
-        }
+        # result = {
+        #     "seq": [
+        #         {
+        #             "cycle": 10,
+        #             "press_time":[1,2,3,4, 'a']
+        #         }
+        #     ]
+        # }
         # 色觉检查
         # result = {
         #     "seq": [
@@ -410,10 +412,10 @@ class TestUyuInstrument(unittest.TestCase):
             "step": 2,
             "times": 10,
             "result": json.dumps(result),
-            "name": '聚散灵敏度',
+            "name": '融像检查',
             "id": 10,
             "isend": 0,
-            "token": "dd34d0ed-8d4c-4efa-9fba-c4e4f26f8ff3"
+            "token": "93585612-0b2b-4d76-96cc-a8ca3adf9df6"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
