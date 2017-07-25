@@ -30,24 +30,28 @@ class CreateHandler(core.Handler):
         Field('item_type', T_INT, False, match=r'^([1-2]){1}$'),
         Field('lng', T_FLOAT, False),
         Field('lat', T_FLOAT, False),
-        Field('token', T_STR, False),
+        # Field('token', T_STR, False),
+        Field('token', T_STR, True),
     ]
 
     def _post_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
-    @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
+    # @uyu_check_device_session(g_rt.redis_pool, cookie_conf)
     @with_validator_self
     def _post_handler(self):
-        if not self.device.sauth:
-            return error(UAURET.SESSIONERR)
+        # if not self.device.sauth:
+        #     return error(UAURET.SESSIONERR)
         params = self.validator.data
-        params.pop("token")
+        token = params.pop("token")
         userid = params.get('userid')
         device_id = params.get('device_id')
         item_type = params.get('item_type')
         lng = params.get('lng')
         lat = params.get('lat')
+        if token in ('', None):
+            token = tools.check_device_token(g_rt.redis_pool, device_id)
+            log.debug('create handler device_id=%s, token=%s', device_id, token)
         flag = tools.verify_train_user(userid)
         if not flag:
             return error(UAURET.ROLEERR)
@@ -74,7 +78,7 @@ class CreateHandler(core.Handler):
         if train_id is None:
             return error(UAURET.DATAERR)
         params['id'] = train_id
-        token = self.device.se.sk
+        # token = self.device.se.sk
         push_data = {"msgid": str(uuid.uuid4()), "data": {}}
         if item_type == define.UYU_ITEM_TYPE_TRAIN:
             push_data["type"] = "train"
@@ -303,12 +307,13 @@ class QrcodeHandler(core.Handler):
             return error(UAURET.SESSIONERR)
         params = self.validator.data
         device_id = self.device.data['id']
-        qrcode_txt = 'test'
+        qrcode_txt = tools.gen_device_key(device_id)
         flag, filename = tools.gen_qrcode_file(qrcode_txt)
         if not flag:
             return error(UAURET.GENPICFILEERR)
         qrcode_link = config.QRCODE_LINK_BASE + filename
-        data = {'device_id': device_id, 'qrcode': qrcode_txt, 'qrcode_link': qrcode_link}
+        qrcode_content = config.QRCODE_CONTENT_PREFIX + qrcode_txt
+        data = {'device_id': device_id, 'qrcode': qrcode_content, 'qrcode_link': qrcode_link}
         return success(data=data)
 
     def GET(self):

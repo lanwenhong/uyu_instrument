@@ -20,7 +20,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.client = HttpClient(self.server, client_class = RequestsClient)
         self.headers = {'cookie': 'token=93585612-0b2b-4d76-96cc-a8ca3adf9df6'}
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_device_login(self):
         self.url = '/v1/device/auth'
         self.send = {
@@ -230,7 +230,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_train_list(self):
         self.url = '/v1/train/list'
         self.send = {

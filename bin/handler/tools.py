@@ -2,12 +2,14 @@
 import os
 import sys
 import json
+import redis
 import qrcode
 import base64
 import StringIO
 import inspect
 import logging
 import datetime
+import hashids
 import config
 from PIL import Image
 from zbase.base.dbpool import get_connection_exception
@@ -553,8 +555,14 @@ def train_info(train_id):
         else:
             if ret['lng']:
                 ret['lng'] = float(ret['lng'])
+            else:
+                ret['lng'] = 0.00
+
             if ret['lat']:
                 ret['lat'] = float(ret['lat'])
+            else:
+                ret['lat'] = 0.00
+                
         if not result:
             ret['result'] = []
             return ret
@@ -591,8 +599,13 @@ def train_list(offset, limit, userid=''):
                     item['utime'] = datetime.datetime.strftime(item['utime'], '%Y-%m=%d %H:%M:%S')
                 if item['lng']:
                     item['lng'] = float(item['lng'])
+                else:
+                    item['lng'] = 0.00
                 if item['lat']:
                     item['lat'] = float(item['lat'])
+                else:
+                    item['lat'] = 0.00
+
         return ret
 
 
@@ -688,7 +701,7 @@ def gen_qrcode_file(qrcode_txt):
     filename = now.strftime('%Y%m%d%H%M%S%f') + '.png'
     full_name = config.QRCODE_STORE_PATH + filename 
     qr = qrcode.QRCode()
-    qr.add_data(qrcode_txt)
+    qr.add_data(config.QRCODE_CONTENT_PREFIX+qrcode_txt)
     img = qr.make_image()
     out = img.resize(config.IMAGE_SIZE, Image.ANTIALIAS)
     region = out.crop(config.IMAGE_BOX)
@@ -771,3 +784,21 @@ def update_train(train_id, record_id):
         ret = conn.update(table='train', values=values, where=where)
         log.debug('func=%s|update ret=%s', inspect.stack()[0][3], ret)
         return ret
+
+def gen_device_key(device_id):
+    h = hashids.Hashids('~~~uyu~~~')
+    key = h.encode(device_id)
+    return key
+
+
+def check_device_token(redis_pool, device_id):
+    log.debug('func=%s|in|device_id=%s', inspect.stack()[0][3], device_id)
+    result = None
+    client = redis.StrictRedis(connection_pool=redis_pool)
+    device_prefix_key = 'uyu_device_%s' % device_id
+    v = client.get(device_prefix_key)
+    log.debug('device_prefix_key=%s|value=%s', device_prefix_key, v)
+    if v:
+        result = v
+    log.debug('func=%s|out|result=%s', inspect.stack()[0][3], result)
+    return result
