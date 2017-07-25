@@ -52,6 +52,9 @@ class CreateHandler(core.Handler):
         if token in ('', None):
             token = tools.check_device_token(g_rt.redis_pool, device_id)
             log.debug('create handler device_id=%s, token=%s', device_id, token)
+            if not token:
+                log.warn('device_id=%s|not login or expire', device_id)
+                return error(UAURET.SESSIONERR)
         flag = tools.verify_train_user(userid)
         if not flag:
             return error(UAURET.ROLEERR)
