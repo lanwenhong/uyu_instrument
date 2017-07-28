@@ -20,7 +20,7 @@ log = logging.getLogger()
 class CreateHandler(core.Handler): 
     _post_handler_fields = [
         Field('name', T_STR, False),
-        Field('item_type', T_INT, False, match=r'^([0-1]){1}$'),
+        Field('item_type', T_INT, False, match=r'^([1-2]){1}$'),
         Field('token', T_STR, False),
         # Field('content', T_STR, False),
     ]
@@ -65,7 +65,7 @@ class UpdateHandler(core.Handler):
     _post_handler_fields = [
         Field('id', T_INT, False),
         Field('name', T_STR, False),
-        Field('item_type', T_INT, False, match=r'^([0-1]){1}$'),
+        Field('item_type', T_INT, False, match=r'^([1-2]){1}$'),
         Field('token', T_STR, False),
         # Field('content', T_STR, False),
     ]
