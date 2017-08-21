@@ -43,7 +43,7 @@ CHECK_ITEM_NAME = {
     '视力检查': {
         'keys': {
             'seq': {
-                'must': ['optic', 'font_size', 'vision', 'eye'],
+                'must': ['optic', 'font_size', 'vision', 'eye', 'pd'],
                 'option': []
             },
             'glasses': True
@@ -52,7 +52,7 @@ CHECK_ITEM_NAME = {
     '红绿检查': {
         'keys': {
             'seq': {
-                'must': ['eye', 'color'],
+                'must': ['eye', 'color', 'pd'],
                 'option': []
             },
             'glasses': True
@@ -61,7 +61,7 @@ CHECK_ITEM_NAME = {
     'worth4点': {
         'keys': {
             'seq': {
-                'must': ['optic', 'pic_num'],
+                'must': ['optic', 'pic_num', 'pd'],
                 'option': ['pic_pos']
             }
         }
@@ -69,7 +69,7 @@ CHECK_ITEM_NAME = {
     '眼位测量': {
         'keys': {
             'seq': {
-                'must': ['optic', 'overlap_dis1', 'overlap_dis2'],
+                'must': ['optic', 'overlap_dis1', 'overlap_dis2', 'pd'],
                 'option': []
             }
         },
@@ -78,7 +78,7 @@ CHECK_ITEM_NAME = {
     '眼位测量2': {
         'keys': {
             'seq': {
-                'must': ['optic', 'pos'],
+                'must': ['optic', 'pos', 'pd'],
                 'option': []
             }
         }
@@ -86,7 +86,7 @@ CHECK_ITEM_NAME = {
     '融像检查': {
         'keys': {
             'seq': {
-                'must': ['optic', 'pic_dis_blur', 'pic_dis_burst', 'pic_dis_recover', 'base'],
+                'must': ['optic', 'pic_dis_blur', 'pic_dis_burst', 'pic_dis_recover', 'base', 'pd'],
                 'option': []
             }
         }
@@ -94,7 +94,7 @@ CHECK_ITEM_NAME = {
     '调节功能检查': {
         'keys': {
             'seq': {
-                'must': ['adjust', 'eye', 'optic', 'pad_dis'],
+                'must': ['adjust', 'eye', 'optic', 'pad_dis', 'pd'],
                 'option': ['excite']
             }
         },
@@ -103,7 +103,7 @@ CHECK_ITEM_NAME = {
     '调节灵敏度': {
         'keys': {
             'seq': {
-                'must': ['eye', 'cycle', 'press_time'],
+                'must': ['eye', 'cycle', 'press_time', 'pd'],
                 'option': []
             }
         }
@@ -111,7 +111,7 @@ CHECK_ITEM_NAME = {
     '聚散灵敏度': {
         'keys': {
             'seq': {
-                'must': ['cycle', 'press_time'],
+                'must': ['cycle', 'press_time', 'pd'],
                 'option': []
             }
         }
@@ -119,7 +119,7 @@ CHECK_ITEM_NAME = {
     '色觉检查': {
         'keys': {
             'seq': {
-                'must': ['color', 'color_sense'],
+                'must': ['color', 'color_sense', 'pd'],
                 'option': []
             }
         }
@@ -127,7 +127,7 @@ CHECK_ITEM_NAME = {
     '立体视检查': {
         'keys': {
             'seq': {
-                'must': ['pic_name'],
+                'must': ['pic_name', 'pd'],
                 'option': []
             }
         }

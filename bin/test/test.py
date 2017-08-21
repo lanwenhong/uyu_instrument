@@ -18,9 +18,9 @@ class TestUyuInstrument(unittest.TestCase):
         self.timeout = 2000
         self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
         self.client = HttpClient(self.server, client_class = RequestsClient)
-        self.headers = {'cookie': 'token=93585612-0b2b-4d76-96cc-a8ca3adf9df6'}
+        self.headers = {'cookie': 'token=7600e7db-efdf-438b-9772-acfdacba8898'}
 
-    # @unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_device_login(self):
         self.url = '/v1/device/auth'
         self.send = {
@@ -159,9 +159,9 @@ class TestUyuInstrument(unittest.TestCase):
         self.url = '/v1/prescription/add_item'
         self.send = {
             "id": 8,
-            "item_id": 19,
+            "item_id": 16,
             "count": 5,
-            "token": "93585612-0b2b-4d76-96cc-a8ca3adf9df6"
+            "token": "7600e7db-efdf-438b-9772-acfdacba8898"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
@@ -245,7 +245,7 @@ class TestUyuInstrument(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    # @unittest.skip("skipping")
     def test_train_complete(self):
         self.url = '/v1/train/complete'
         # 视力检查
@@ -256,16 +256,18 @@ class TestUyuInstrument(unittest.TestCase):
         #                 "font_size": 10,
         #                 "eye": "l",
         #                 "optic": 250,
-        #                 "vision": 0.8
+        #                 "vision": 0.8,
+        #                 "pd": 10,
         #             }, 
         #             {
         #                 "font_size": 12,
         #                 "eye": "r",
         #                 "optic": 250,
-        #                 "vision": 0.8
+        #                 "vision": 0.8,
+        #                 "pd": 10,
         #             }
         #         ], 
-        #     "glasses": 'true'
+        #     "glasses": True
         # }
 
         # 红绿检查
@@ -273,14 +275,16 @@ class TestUyuInstrument(unittest.TestCase):
         #     "seq": [
         #         {
         #             "color": "r",
-        #             "eye": "l"
+        #             "eye": "l",
+        #             "pd": 10,
         #         },
         #         {
         #             "color": "b",
-        #             "eye": "r"
+        #             "eye": "r",
+        #             "pd": 10,
         #         }
         #     ],
-        #     "glasses": 'true'
+        #     "glasses": True
         # }
         # worth4点
         # result = {
@@ -319,14 +323,16 @@ class TestUyuInstrument(unittest.TestCase):
                     "pic_dis_recover": 3,
                     "optic": 250,
                     "pic_dis_blur": 1,
-                    "base": 'BO'
+                    "base": 'BO',
+                    "pd": 10,
                 },
                 {
                     "pic_dis_burst": 2,
                     "pic_dis_recover": 3,
                     "optic": 250,
                     "pic_dis_blur": 1,
-                    "base": 'BI'
+                    "base": 'BI',
+                    "pd": 10,
                 }
             ]
         }
@@ -415,7 +421,7 @@ class TestUyuInstrument(unittest.TestCase):
             "name": '融像检查',
             "id": 10,
             "isend": 0,
-            "token": "93585612-0b2b-4d76-96cc-a8ca3adf9df6"
+            "token": "7600e7db-efdf-438b-9772-acfdacba8898"
         }
         ret = self.client.post(self.url, self.send, headers=self.headers)
         log.info(ret)
