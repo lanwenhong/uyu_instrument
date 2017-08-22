@@ -316,26 +316,26 @@ class TestUyuInstrument(unittest.TestCase):
         #     ] 
         # }
         # 融像检查
-        result = {
-            "seq": [
-                {
-                    "pic_dis_burst": 2,
-                    "pic_dis_recover": 3,
-                    "optic": 250,
-                    "pic_dis_blur": 1,
-                    "base": 'BO',
-                    "pd": 10,
-                },
-                {
-                    "pic_dis_burst": 2,
-                    "pic_dis_recover": 3,
-                    "optic": 250,
-                    "pic_dis_blur": 1,
-                    "base": 'BI',
-                    "pd": 10,
-                }
-            ]
-        }
+        # result = {
+        #     "seq": [
+        #         {
+        #             "pic_dis_burst": 2,
+        #             "pic_dis_recover": 3,
+        #             "optic": 250,
+        #             "pic_dis_blur": 1,
+        #             "base": 'BO',
+        #             "pd": '10',
+        #         },
+        #         {
+        #             "pic_dis_burst": 2,
+        #             "pic_dis_recover": 3,
+        #             "optic": 250,
+        #             "pic_dis_blur": 1,
+        #             "base": 'BI',
+        #             "pd": 10,
+        #         }
+        #     ]
+        # }
         # 眼位测量2
         # result = {
         #     "seq": [
@@ -380,14 +380,15 @@ class TestUyuInstrument(unittest.TestCase):
         #     ]
         # }
         # 聚散灵敏度
-        # result = {
-        #     "seq": [
-        #         {
-        #             "cycle": 10,
-        #             "press_time":[1,2,3,4, 'a']
-        #         }
-        #     ]
-        # }
+        result = {
+            "seq": [
+                {
+                    "cycle": 10,
+                    "press_time":[1,2,3,4],
+                    "pd": 'ab',
+                }
+            ]
+        }
         # 垃圾数据
         # result = {
         #     "seq": [
@@ -418,7 +419,7 @@ class TestUyuInstrument(unittest.TestCase):
             "step": 2,
             "times": 10,
             "result": json.dumps(result),
-            "name": '融像检查',
+            "name": '聚散灵敏度',
             "id": 10,
             "isend": 0,
             "token": "7600e7db-efdf-438b-9772-acfdacba8898"

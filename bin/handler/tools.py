@@ -43,8 +43,8 @@ CHECK_ITEM_NAME = {
     '视力检查': {
         'keys': {
             'seq': {
-                'must': ['optic', 'font_size', 'vision', 'eye', 'pd'],
-                'option': []
+                'must': ['optic', 'font_size', 'vision', 'eye'],
+                'option': ['pd']
             },
             'glasses': True
         }
@@ -52,8 +52,8 @@ CHECK_ITEM_NAME = {
     '红绿检查': {
         'keys': {
             'seq': {
-                'must': ['eye', 'color', 'pd'],
-                'option': []
+                'must': ['eye', 'color'],
+                'option': ['pd']
             },
             'glasses': True
         }
@@ -61,16 +61,16 @@ CHECK_ITEM_NAME = {
     'worth4点': {
         'keys': {
             'seq': {
-                'must': ['optic', 'pic_num', 'pd'],
-                'option': ['pic_pos']
+                'must': ['optic', 'pic_num'],
+                'option': ['pic_pos', 'pd']
             }
         }
     },
     '眼位测量': {
         'keys': {
             'seq': {
-                'must': ['optic', 'overlap_dis1', 'overlap_dis2', 'pd'],
-                'option': []
+                'must': ['optic', 'overlap_dis1', 'overlap_dis2'],
+                'option': ['pd']
             }
         },
         'func': 'eye_level_measurement'
@@ -78,24 +78,24 @@ CHECK_ITEM_NAME = {
     '眼位测量2': {
         'keys': {
             'seq': {
-                'must': ['optic', 'pos', 'pd'],
-                'option': []
+                'must': ['optic', 'pos'],
+                'option': ['pd']
             }
         }
     },
     '融像检查': {
         'keys': {
             'seq': {
-                'must': ['optic', 'pic_dis_blur', 'pic_dis_burst', 'pic_dis_recover', 'base', 'pd'],
-                'option': []
+                'must': ['optic', 'pic_dis_blur', 'pic_dis_burst', 'pic_dis_recover', 'base'],
+                'option': ['pd']
             }
         }
     },
     '调节功能检查': {
         'keys': {
             'seq': {
-                'must': ['adjust', 'eye', 'optic', 'pad_dis', 'pd'],
-                'option': ['excite']
+                'must': ['adjust', 'eye', 'optic', 'pad_dis'],
+                'option': ['excite', 'pd']
             }
         },
         'func': 'calc_excite'
@@ -103,32 +103,32 @@ CHECK_ITEM_NAME = {
     '调节灵敏度': {
         'keys': {
             'seq': {
-                'must': ['eye', 'cycle', 'press_time', 'pd'],
-                'option': []
+                'must': ['eye', 'cycle', 'press_time'],
+                'option': ['pd']
             }
         }
     },
     '聚散灵敏度': {
         'keys': {
             'seq': {
-                'must': ['cycle', 'press_time', 'pd'],
-                'option': []
+                'must': ['cycle', 'press_time'],
+                'option': ['pd']
             }
         }
     },
     '色觉检查': {
         'keys': {
             'seq': {
-                'must': ['color', 'color_sense', 'pd'],
-                'option': []
+                'must': ['color', 'color_sense'],
+                'option': ['pd']
             }
         }
     },
     '立体视检查': {
         'keys': {
             'seq': {
-                'must': ['pic_name', 'pd'],
-                'option': []
+                'must': ['pic_name'],
+                'option': ['pd']
             }
         }
     }
@@ -152,6 +152,9 @@ def check_result(name, result):
         log.warn('func=%s|key=%s|invalid', 'check_result', 'seq')
         return False
     must_keyes = check['seq']['must']
+    option_keyes = check['seq']['option']
+    option_int = ['excite', 'pd']
+    option_string = ['pic_pos']
     for item in seq:
         for key in must_keyes:
             if not item.has_key(key):
@@ -167,8 +170,29 @@ def check_result(name, result):
                     return flag
                 # 是一个list检查每一项的类型
                 for v in value:
-                    if not isinstance(int(v), int):
+                    try:
+                        v = int(v)
+                    except Exception as e:
                         log.warn('func=%s|key=%s|v error', 'check_result', key)
+                        flag = False
+                        return flag
+                        
+
+        # 可选字段传了再检查
+        for key in option_keyes:
+            if item.has_key(key):
+                value = item[key]
+                if key in option_int:
+                    try:
+                        item[key] = int(value)
+                    except Exception as e:
+                        log.warn(e)
+                        log.warn('func=%s|key=%s|option|v error', 'check_result', key)
+                        flag = False
+                        return flag
+                if key in option_string:
+                    if not isinstance(value, basestring):
+                        log.warn('func=%s|key=%s|option|v error', 'check_result', key)
                         flag = False
                         return flag
 
